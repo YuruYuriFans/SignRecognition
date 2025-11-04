@@ -46,8 +46,3 @@ def evaluate(model, testloader):
     testing_accuracy = correct_count / total_count
     print("each class accuracy:\n", class_count / class_sum * 100)
     return testing_accuracy.item()
-                
-                
-                
-                
-            

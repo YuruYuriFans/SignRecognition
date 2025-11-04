@@ -1,0 +1,81 @@
+Using device: cuda
+GPU: NVIDIA GeForce RTX 4060 Laptop GPU
+
+============================================================
+Loading test dataset...
+============================================================
+Loaded 12630 test images from Final_Test
+
+============================================================
+Loading trained model...
+============================================================
+
+Loading model from: best_lenet_model.pth
+Model accuracy on validation: 98.83%
+Model trained for 22 epochs
+Model loaded successfully!
+
+============================================================
+Making predictions...
+============================================================
+
+============================================================
+Saving results...
+============================================================
+
+Saving predictions to: predictions/predictions.csv
+Saved 12630 predictions to CSV
+Saving detailed predictions to: predictions/predictions_detailed.txt
+Saved detailed predictions to text file
+
+============================================================
+Prediction Summary
+============================================================
+
+Found ground truth file: GTSRB_Test_GT.csv
+Loaded ground truth for 12630 images from GTSRB_Test_GT.csv
+
+============================================================
+Evaluating predictions against ground truth...
+============================================================
+
+Matched 12630 predictions with ground truth labels
+
+Generating confusion matrix...
+Confusion matrix saved to: predictions/confusion_matrix.png
+
+Calculating evaluation metrics...
+Evaluation metrics saved to: predictions/evaluation_metrics.txt
+
+============================================================
+EVALUATION RESULTS
+============================================================
+
+Metric               Score           Percentage
+------------------------------------------------------------
+Accuracy             0.9513          95.13%
+Precision (macro)    0.9360          93.60%
+Recall (macro)       0.9256          92.56%
+F1-Score (macro)     0.9268          92.68%
+============================================================
+
+Metric Explanations:
+  • Accuracy:  Overall correctness of predictions
+  • Precision: How many predicted positives are actually positive
+  • Recall:    How many actual positives were correctly found
+  • F1-Score:  Balanced measure of precision and recall
+============================================================
+
+============================================================
+✓ Prediction completed successfully!
+============================================================
+
+Output files:
+  1. predictions/predictions.csv - For evaluation
+  2. predictions/predictions_detailed.txt - Detailed results
+  3. predictions/confusion_matrix.png - Visual confusion matrix
+  4. predictions/evaluation_metrics.txt - Comprehensive metrics
+
+Evaluation complete! Check the metrics file for detailed performance.
+============================================================
+
