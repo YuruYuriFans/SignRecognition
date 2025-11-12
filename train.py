@@ -334,7 +334,7 @@ Examples:
                        help='Learning rate (default: 0.001)')
     
     parser.add_argument('--models', nargs='+',
-                       choices=['lenet', 'shallow_cnn', 'minivgg', 'mobilenetv2_025', 'mobilenetv1_025', 'shufflenetv2_025'],
+                       choices=['lenet', 'minivgg', 'mobilenetv2_025', 'mobilenetv4_small', 'mobilenetv4_medium', 'mobilenetv4_large'],
                        help='Which models to train (default: all)')
     
     args = parser.parse_args()
@@ -358,7 +358,7 @@ Examples:
 
     # Determine model list (default: train all supported models)
     # Place MobileNetV2 first in the default training order
-    available_models = ['mobilenetv2_025', 'lenet', 'shallow_cnn', 'minivgg', 'mobilenetv1_025', 'shufflenetv2_025']
+    available_models = ['mobilenetv2_025', 'lenet', 'minivgg', 'mobilenetv4_small', 'mobilenetv4_medium', 'mobilenetv4_large']
     if args.models:
         models_to_run = args.models
     else:
