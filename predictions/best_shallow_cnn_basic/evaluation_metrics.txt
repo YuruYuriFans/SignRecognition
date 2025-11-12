@@ -1,0 +1,4 @@
+Model: best_shallow_cnn_basic
+Augmentation: basic
+Accuracy: 0.9710
+Macro F1: 0.9571

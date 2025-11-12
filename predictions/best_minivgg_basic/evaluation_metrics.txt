@@ -1,0 +1,4 @@
+Model: best_minivgg_basic
+Augmentation: basic
+Accuracy: 0.9778
+Macro F1: 0.9635

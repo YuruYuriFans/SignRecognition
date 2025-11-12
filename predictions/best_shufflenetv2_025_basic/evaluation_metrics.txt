@@ -1,0 +1,4 @@
+Model: best_shufflenetv2_025_basic
+Augmentation: basic
+Accuracy: 0.9441
+Macro F1: 0.9224

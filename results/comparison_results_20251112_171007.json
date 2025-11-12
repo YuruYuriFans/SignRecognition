@@ -1,0 +1,158 @@
+[
+  {
+    "model": "mobilenetv2_025",
+    "augmentation": "basic",
+    "description": "Basic augmentation (rotation, color jitter)",
+    "best_val_acc": 31.318541188472327,
+    "final_train_acc": 14.38449331217411,
+    "final_val_acc": 31.318541188472327,
+    "final_gap": -16.934047876298216,
+    "history": {
+      "train_loss": [
+        3.067400150972864
+      ],
+      "train_acc": [
+        14.38449331217411
+      ],
+      "val_loss": [
+        2.244220612510558
+      ],
+      "val_acc": [
+        31.318541188472327
+      ],
+      "epochs": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "lenet",
+    "augmentation": "basic",
+    "description": "Basic augmentation (rotation, color jitter)",
+    "best_val_acc": 79.90308594746239,
+    "final_train_acc": 41.416345499886646,
+    "final_val_acc": 79.90308594746239,
+    "final_gap": -38.48674044757574,
+    "history": {
+      "train_loss": [
+        1.9771562650583792
+      ],
+      "train_acc": [
+        41.416345499886646
+      ],
+      "val_loss": [
+        0.6531410366296768
+      ],
+      "val_acc": [
+        79.90308594746239
+      ],
+      "epochs": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "shallow_cnn",
+    "augmentation": "basic",
+    "description": "Basic augmentation (rotation, color jitter)",
+    "best_val_acc": 95.61336393777097,
+    "final_train_acc": 60.235774200861485,
+    "final_val_acc": 95.61336393777097,
+    "final_gap": -35.377589736909485,
+    "history": {
+      "train_loss": [
+        1.3992386137445767
+      ],
+      "train_acc": [
+        60.235774200861485
+      ],
+      "val_loss": [
+        0.2432771636353385
+      ],
+      "val_acc": [
+        95.61336393777097
+      ],
+      "epochs": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "minivgg",
+    "augmentation": "basic",
+    "description": "Basic augmentation (rotation, color jitter)",
+    "best_val_acc": 97.8321856669217,
+    "final_train_acc": 68.0457946043981,
+    "final_val_acc": 97.8321856669217,
+    "final_gap": -29.786391062523606,
+    "history": {
+      "train_loss": [
+        1.1296722981943816
+      ],
+      "train_acc": [
+        68.0457946043981
+      ],
+      "val_loss": [
+        0.09269031934860733
+      ],
+      "val_acc": [
+        97.8321856669217
+      ],
+      "epochs": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "mobilenetv1_025",
+    "augmentation": "basic",
+    "description": "Basic augmentation (rotation, color jitter)",
+    "best_val_acc": 45.422086202499365,
+    "final_train_acc": 23.26003173883473,
+    "final_val_acc": 45.422086202499365,
+    "final_gap": -22.162054463664635,
+    "history": {
+      "train_loss": [
+        2.7886604269345603
+      ],
+      "train_acc": [
+        23.26003173883473
+      ],
+      "val_loss": [
+        1.8053874873345899
+      ],
+      "val_acc": [
+        45.422086202499365
+      ],
+      "epochs": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "shufflenetv2_025",
+    "augmentation": "basic",
+    "description": "Basic augmentation (rotation, color jitter)",
+    "best_val_acc": 58.81152767151237,
+    "final_train_acc": 28.196554069372024,
+    "final_val_acc": 58.81152767151237,
+    "final_gap": -30.61497360214035,
+    "history": {
+      "train_loss": [
+        2.499125421695087
+      ],
+      "train_acc": [
+        28.196554069372024
+      ],
+      "val_loss": [
+        1.2679327889796226
+      ],
+      "val_acc": [
+        58.81152767151237
+      ],
+      "epochs": [
+        1
+      ]
+    }
+  }
+]

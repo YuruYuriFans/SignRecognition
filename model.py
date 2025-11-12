@@ -361,11 +361,47 @@ class DepthwiseSeparableConv(nn.Module):
 
 class MobileNetV1_025(nn.Module):
     """
-    MobileNetV1 (width multiplier α=0.25)
-    Lightweight CNN using depthwise separable convolutions.
+    MobileNetV1 (width multiplier α=0.25) for Traffic Sign Classification.
 
-    Input: 48x48x3
-    Output: num_classes (default=43 for GTSRB)
+    Lightweight convolutional neural network using depthwise separable convolutions.
+
+    Architecture:
+        Input: 48x48x3 RGB images
+
+        Initial Conv Layer:
+            - Conv2d: 3 -> 8 channels (α=0.25), 3x3 kernel, stride=2, padding=1
+            - BatchNorm2d
+            - ReLU activation
+            Output: 24x24x8
+
+        Depthwise Separable Convolutions:
+            - Block 1: Depthwise 8 -> 8, Pointwise 8 -> 16, stride=1
+            - Block 2: Depthwise 16 -> 16, Pointwise 16 -> 32, stride=2
+            - Block 3: Depthwise 32 -> 32, Pointwise 32 -> 32, stride=1
+            - Block 4: Depthwise 32 -> 32, Pointwise 32 -> 64, stride=2
+            - Block 5: Depthwise 64 -> 64, Pointwise 64 -> 64, stride=1
+            - Block 6: Depthwise 64 -> 64, Pointwise 64 -> 128, stride=2
+            - AdaptiveAvgPool2d: global pooling to 1x1
+
+        Fully Connected (Classifier):
+            - Dropout(p=0.3)
+            - Linear: 128 -> num_classes (43 for GTSRB by default)
+
+    Notes:
+        - DepthwiseSeparableConv consists of:
+            * Depthwise convolution: per-channel spatial convolution
+            * BatchNorm + ReLU
+            * Pointwise convolution: 1x1 convolution to combine channels
+        - Width multiplier α=0.25 reduces channels, making the model lightweight
+        - Dropout is applied only before the final linear layer
+        - Suitable for small datasets or real-time inference with limited parameters
+
+    Args:
+        num_classes (int): Number of output classes (default=43)
+        dropout_rate (float): Dropout probability before classifier (default=0.3)
+
+    Input Shape: (batch_size, 3, 48, 48)
+    Output Shape: (batch_size, num_classes)
     """
     def __init__(self, num_classes=43, dropout_rate=0.3):
         super().__init__()
@@ -409,6 +445,115 @@ class MobileNetV1_025(nn.Module):
             'architecture': 'Depthwise separable CNN, α=0.25'
         }
 
+class InvertedResidual(nn.Module):
+    """Inverted Residual Block used in MobileNetV2."""
+    def __init__(self, in_channels, out_channels, stride, expand_ratio, activation=nn.ReLU6):
+        super().__init__()
+        hidden_dim = int(in_channels * expand_ratio)
+        self.use_res_connect = stride == 1 and in_channels == out_channels
+
+        layers = []
+        if expand_ratio != 1:
+            # 1x1 expansion
+            layers.append(nn.Conv2d(in_channels, hidden_dim, 1, 1, 0, bias=False))
+            layers.append(nn.BatchNorm2d(hidden_dim))
+            layers.append(activation(inplace=True))
+
+        # Depthwise
+        layers.append(nn.Conv2d(hidden_dim, hidden_dim, 3, stride, 1, groups=hidden_dim, bias=False))
+        layers.append(nn.BatchNorm2d(hidden_dim))
+        layers.append(activation(inplace=True))
+
+        # Pointwise linear projection
+        layers.append(nn.Conv2d(hidden_dim, out_channels, 1, 1, 0, bias=False))
+        layers.append(nn.BatchNorm2d(out_channels))
+
+        self.conv = nn.Sequential(*layers)
+
+    def forward(self, x):
+        if self.use_res_connect:
+            return x + self.conv(x)
+        else:
+            return self.conv(x)
+
+class MobileNetV2_025(nn.Module):
+    """
+    MobileNetV2 (width multiplier α=0.25) for 48x48 images.
+
+    Args:
+        num_classes (int): number of output classes
+        dropout_rate (float): dropout rate before classifier
+        width_mult (float): width multiplier α
+        activation (nn.Module): activation function class, e.g., nn.ReLU or nn.SiLU
+    """
+    def __init__(self, num_classes=43, dropout_rate=0.3, width_mult=0.25, activation=nn.ReLU6):
+        super().__init__()
+        self.width_mult = width_mult
+        def c(ch): return max(8, int(ch * width_mult))
+
+        # Initial conv
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(3, c(16), 3, stride=2, padding=1, bias=False),
+            nn.BatchNorm2d(c(16)),
+            activation(inplace=True)
+        )
+
+        # Bottleneck blocks: t, c, n, s
+        inverted_residual_setting = [
+            [1, 16, 1, 1],
+            [6, 24, 2, 2],
+            [6, 32, 3, 2],
+            [6, 64, 4, 2],
+            [6, 96, 3, 1],
+        ]
+
+        in_channels = c(16)
+        layers = []
+        for t, c_out, n, s in inverted_residual_setting:
+            out_channels = c(c_out)
+            for i in range(n):
+                stride = s if i == 0 else 1
+                layers.append(InvertedResidual(in_channels, out_channels, stride, expand_ratio=t, activation=activation))
+                in_channels = out_channels
+        self.features = nn.Sequential(*layers)
+
+        # Final conv
+        self.conv_last = nn.Sequential(
+            nn.Conv2d(in_channels, c(512), 1, 1, 0, bias=False),
+            nn.BatchNorm2d(c(512)),
+            activation(inplace=True)
+        )
+
+        # Pooling and classifier
+        self.global_pool = nn.AdaptiveAvgPool2d(1)
+        self.dropout = nn.Dropout(dropout_rate)
+        self.fc = nn.Linear(c(512), num_classes)
+
+        self.model_name = 'mobilenetv2_025'
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.features(x)
+        x = self.conv_last(x)
+        x = self.global_pool(x).flatten(1)
+        x = self.dropout(x)
+        x = self.fc(x)
+        return x
+
+    def get_num_parameters(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
+    def get_model_info(self):
+        return {
+            'name': 'MobileNetV2 (α={:.2f})'.format(self.width_mult),
+            'type': self.model_name,
+            'input_size': (3, 48, 48),
+            'num_classes': self.fc.out_features,
+            'num_parameters': self.get_num_parameters(),
+            'dropout_rate': self.dropout.p,
+            'architecture': 'Initial conv + inverted residual blocks + final conv + global pool + fc'
+        }    
+    
 
 # ---------------------------------------------------------------------
 # ShuffleNetV2 (0.25×)
@@ -543,9 +688,14 @@ def create_model(model_name: str, num_classes=43, **kwargs):
         return MobileNetV1_025(num_classes=num_classes, **kwargs)
     elif model_name in ['shufflenetv2_025', 'shufflenet025']:
         return ShuffleNetV2_025(num_classes=num_classes, **kwargs)
+    elif model_name in ['mobilenetv2_025', 'mobilenetv2']:
+        return MobileNetV2_025(num_classes=num_classes, **kwargs)
     else:
-        raise ValueError(f"Unknown model: {model_name}. Available: "
-                         "'lenet', 'shallow_cnn', 'minivgg', 'mobilenetv1_025', 'shufflenetv2_025'")
+        raise ValueError(
+            f"Unknown model: {model_name}. Available: "
+            "'lenet', 'shallow_cnn', 'minivgg', 'mobilenetv1_025', "
+            "'shufflenetv2_025', 'mobilenetv2_025'"
+        )
 
 
 
@@ -602,3 +752,15 @@ if __name__ == '__main__':
     input_tensor = torch.randn(1, 3, 48, 48)
     out_shufflenet = shufflenet(input_tensor)
     print(f"\nShuffleNetV2_025 forward pass check: {out_shufflenet.shape}")
+
+    # 6. Test MobileNetV2_025
+    mobilenetv2 = create_model('mobilenetv2_025', dropout_rate=0.3)
+    info_mobilenetv2 = mobilenetv2.get_model_info()
+    print(f"\nModel: {info_mobilenetv2['type'].upper()} ({info_mobilenetv2['name']})")
+    print(f"  Total parameters: {info_mobilenetv2['num_parameters']:,}")
+    print(f"  Dropout rate: {0.3}")
+
+    # MobileNetV2 forward pass check
+    input_tensor = torch.randn(1, 3, 48, 48)
+    out_mobilenetv2 = mobilenetv2(input_tensor)
+    print(f"\nMobileNetV2_025 forward pass check: {out_mobilenetv2.shape}")

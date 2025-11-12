@@ -42,7 +42,7 @@ from datetime import datetime
 
 # Import refactored components
 # Assuming model.py, dataset.py, and augmentation.py are in the same directory
-from model import LeNet
+from model import create_model
 from dataset import GTSRBDataset
 from augmentation import get_augmentation_transforms
 
@@ -103,7 +103,7 @@ def validate_model(model, val_loader, criterion, device):
     return avg_loss, accuracy
 
 
-def train_with_augmentation(aug_type, args, device):
+def train_with_augmentation(aug_type, args, device, model_name='lenet'):
     """
     Train model with specified augmentation strategy.
     
@@ -167,11 +167,11 @@ def train_with_augmentation(aug_type, args, device):
         pin_memory=True if torch.cuda.is_available() else False
     )
     
-    # Initialize model from model.py
-    print(f"\nInitializing model...")
-    # The LeNet in model.py defaults to 43 classes and 0.5 dropout, which matches the original train.py logic.
-    model = LeNet(num_classes=43, dropout_rate=0.5).to(device) 
-    print(f"Model parameters: {sum(p.numel() for p in model.parameters())}")
+    # Initialize model from model.py using the factory
+    print(f"\nInitializing model '{model_name}'...")
+    # Use create_model to instantiate the requested architecture
+    model = create_model(model_name, num_classes=43, dropout_rate=0.5).to(device)
+    print(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
     
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss()
@@ -210,16 +210,19 @@ def train_with_augmentation(aug_type, args, device):
         
         if val_acc > best_acc:
             best_acc = val_acc
-            model_name = f'best_lenet_model_{aug_type}.pth'
+            # Ensure trained_models directory exists
+            os.makedirs('trained_models', exist_ok=True)
+            save_name = os.path.join('trained_models', f'best_{model_name}_{aug_type}.pth')
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'accuracy': best_acc,
                 'augmentation': aug_type,
+                'model': model_name,
                 'input_size': 48
-            }, model_name)
-            print(f'Best model saved: {model_name} (Val Acc: {best_acc:.2f}%)')
+            }, save_name)
+            print(f'Best model saved: {save_name} (Val Acc: {best_acc:.2f}%)')
     
     # Final results
     final_gap = history['train_acc'][-1] - history['val_acc'][-1]
@@ -238,6 +241,7 @@ def train_with_augmentation(aug_type, args, device):
         print("Significant overfitting detected")
     
     results = {
+        'model': model_name,
         'augmentation': aug_type,
         'description': description,
         'best_val_acc': best_acc,
@@ -290,7 +294,7 @@ def compare_results(all_results):
     
     # Save comparison results
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    results_file = f'comparison_results_{timestamp}.json'
+    results_file = f'./results/comparison_results_{timestamp}.json'
     
     with open(results_file, 'w') as f:
         json.dump(all_results, f, indent=2)
@@ -329,6 +333,10 @@ Examples:
     parser.add_argument('--lr', type=float, default=0.001,
                        help='Learning rate (default: 0.001)')
     
+    parser.add_argument('--models', nargs='+',
+                       choices=['lenet', 'shallow_cnn', 'minivgg', 'mobilenetv2_025', 'mobilenetv1_025', 'shufflenetv2_025'],
+                       help='Which models to train (default: all)')
+    
     args = parser.parse_args()
     
     # Device configuration
@@ -345,12 +353,24 @@ Examples:
     print(f"  Learning rate: {args.lr}")
     print(f"  Compare mode: {args.compare}")
     
-    # Train with each augmentation strategy
+    # Train with each augmentation strategy and model
     all_results = []
-    
-    for aug_type in args.aug:
-        result = train_with_augmentation(aug_type, args, device)
-        all_results.append(result)
+
+    # Determine model list (default: train all supported models)
+    # Place MobileNetV2 first in the default training order
+    available_models = ['mobilenetv2_025', 'lenet', 'shallow_cnn', 'minivgg', 'mobilenetv1_025', 'shufflenetv2_025']
+    if args.models:
+        models_to_run = args.models
+    else:
+        models_to_run = available_models
+
+    for model_name in models_to_run:
+        if model_name not in available_models:
+            print(f"Warning: Unknown model '{model_name}' - skipping.")
+            continue
+        for aug_type in args.aug:
+            result = train_with_augmentation(aug_type, args, device, model_name=model_name)
+            all_results.append(result)
     
     # Compare results if multiple strategies or compare flag is set
     if len(all_results) > 1 or args.compare:

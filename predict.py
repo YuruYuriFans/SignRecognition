@@ -43,7 +43,8 @@ import re
 import json
 
 # --- Import Refactored Components ---
-from model import LeNet
+# Use the model factory so we can load different architectures saved by the training script
+from model import create_model, LeNet
 # GTSRB_Test_Loader is in dataset.py, but we will define a simple helper
 # to get the test transform needed for the loader.
 from dataset import GTSRB_Test_Loader
@@ -78,21 +79,63 @@ def load_model(model_path, device):
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Model file not found: {model_path}")
     
-    # Initialize model with 43 classes (default for GTSRB)
-    model = LeNet(num_classes=43).to(device)
+    # Load checkpoint first so we can infer which architecture to instantiate
     checkpoint = torch.load(model_path, map_location=device)
-    
+
+    # Determine model type: prefer explicit 'model' key saved by train.py, else infer from filename
+    model_type = checkpoint.get('model') if isinstance(checkpoint, dict) else None
+    if not model_type:
+        bn = os.path.basename(model_path).lower()
+        for candidate in ['lenet', 'shallow_cnn', 'minivgg', 'mobilenetv1_025', 'shufflenetv2_025']:
+            if candidate in bn:
+                model_type = candidate
+                break
+
+    if not model_type:
+        # fallback to LeNet for backward compatibility
+        model_type = 'lenet'
+
+    # Use saved metadata when available
+    num_classes = checkpoint.get('num_classes', 43) if isinstance(checkpoint, dict) else 43
+    dropout_rate = checkpoint.get('dropout_rate', 0.5) if isinstance(checkpoint, dict) else 0.5
+
+    # Instantiate model via factory
+    try:
+        model = create_model(model_type, num_classes=num_classes, dropout_rate=dropout_rate).to(device)
+    except Exception as e:
+        # As a last resort, fall back to LeNet
+        print(f"Warning: could not create model '{model_type}' ({e}), falling back to LeNet")
+        model = LeNet(num_classes=num_classes).to(device)
+
     checkpoint_info = {
-        'accuracy': checkpoint.get('accuracy'),
-        'augmentation': checkpoint.get('augmentation', 'N/A'),
-        'input_size': checkpoint.get('input_size', 48)
+        'accuracy': checkpoint.get('accuracy') if isinstance(checkpoint, dict) else None,
+        'augmentation': checkpoint.get('augmentation', 'N/A') if isinstance(checkpoint, dict) else 'N/A',
+        'input_size': checkpoint.get('input_size', 48) if isinstance(checkpoint, dict) else 48,
+        'model': model_type
     }
-    
-    if 'model_state_dict' in checkpoint:
-        model.load_state_dict(checkpoint['model_state_dict'])
-    else:
-        model.load_state_dict(checkpoint) # Support older save formats
-    
+
+    # Load state dict: support both wrapped checkpoints and plain state_dicts
+    try:
+        if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+            try:
+                model.load_state_dict(checkpoint['model_state_dict'])
+            except RuntimeError as e:
+                # Try non-strict load (useful if layer names differ slightly)
+                print(f"State dict load (strict) failed: {e}\nRetrying with strict=False...")
+                model.load_state_dict(checkpoint['model_state_dict'], strict=False)
+        elif isinstance(checkpoint, dict):
+            # maybe the dict itself is the state_dict
+            try:
+                model.load_state_dict(checkpoint)
+            except RuntimeError as e:
+                print(f"State dict load failed: {e}\nAttempting non-strict load...")
+                model.load_state_dict(checkpoint, strict=False)
+        else:
+            # checkpoint is not a dict: assume it's a state_dict-like object
+            model.load_state_dict(checkpoint)
+    except Exception as e:
+        raise RuntimeError(f"Failed to load model state for '{model_type}' from {model_path}: {e}")
+
     model.eval()
     return model, checkpoint_info
 
@@ -281,7 +324,7 @@ def main():
     """Main prediction function."""
     
     # Configuration
-    model_glob = 'best_lenet_model_*.pth' # Wildcard for finding all trained models
+    model_glob = './trained_models/best_*.pth' # Wildcard for finding all trained models
     test_path = 'Final_Test/Images'
     gt_path = 'GTSRB_Test_GT.csv'
     output_base_dir = 'predictions'
