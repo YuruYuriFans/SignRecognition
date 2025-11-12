@@ -20,7 +20,7 @@ class GTSRB_Test_Loader(Dataset):
     TEST_GT_PATH
         
     '''
-    def __init__(self, TEST_PATH = None, TEST_GT_PATH = 'evaluation/GTSRB_Test_GT.csv'):
+    def __init__(self, TEST_PATH = "GTSRB/Final_Test/Images/", TEST_GT_PATH = 'GTSRB_Test_GT.csv'):
         self.df = pd.read_csv(TEST_GT_PATH,sep=';')
         self.TEST_PATH = TEST_PATH
         self.Transform = Transform
