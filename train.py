@@ -1,33 +1,4 @@
-"""
-German Traffic Sign Recognition - Configurable Data Augmentation
-================================================================
-Training script with command-line configurable augmentation strategies,
-now utilizing refactored modules for model, dataset, and augmentation.
 
-Usage:
-    python train.py --aug none
-    python train.py --aug basic
-    python train.py --aug advanced
-    python train.py --aug none basic advanced --compare
-
-Arguments:
-    --aug: Augmentation strategy (none, basic, advanced)
-           Can specify multiple for comparison
-    --compare: Run all specified strategies and compare results
-    --epochs: Number of training epochs (default: 30)
-    --batch_size: Batch size (default: 64)
-    --lr: Learning rate (default: 0.001)
-
-Examples:
-    # Train with basic augmentation
-    python train.py --aug basic
-    
-    # Compare all three strategies
-    python train.py --aug none basic advanced --compare
-    
-    # Train with custom parameters
-    python train.py --aug advanced --epochs 40 --batch_size 128
-"""
 
 import torch
 import torch.nn as nn
@@ -39,9 +10,23 @@ from tqdm import tqdm
 import argparse
 import json
 from datetime import datetime
+import time
+
+try:
+    from thop import profile as thop_profile
+    _THOP_AVAILABLE = True
+except Exception:
+    thop_profile = None
+    _THOP_AVAILABLE = False
+
+try:
+    import psutil
+    _PSUTIL_AVAILABLE = True
+except Exception:
+    psutil = None
+    _PSUTIL_AVAILABLE = False
 
 # Import refactored components
-# Assuming model.py, dataset.py, and augmentation.py are in the same directory
 from model import create_model
 from dataset import GTSRBDataset
 from augmentation import get_augmentation_transforms
@@ -334,7 +319,10 @@ Examples:
                        help='Learning rate (default: 0.001)')
     
     parser.add_argument('--models', nargs='+',
-                       choices=['lenet', 'minivgg', 'mobilenetv2_025', 'mobilenetv4_small', 'mobilenetv4_medium', 'mobilenetv4_large'],
+                       choices=['lenet', 'minivgg', 'mobilenetv2_025', 'mobilenetv4_small',
+                                # 'mobilenetv4_medium',
+                                # 'mobilenetv4_large',
+                                ],
                        help='Which models to train (default: all)')
     
     args = parser.parse_args()
@@ -358,7 +346,14 @@ Examples:
 
     # Determine model list (default: train all supported models)
     # Place MobileNetV2 first in the default training order
-    available_models = ['mobilenetv2_025', 'lenet', 'minivgg', 'mobilenetv4_small', 'mobilenetv4_medium', 'mobilenetv4_large']
+    available_models = [
+        'mobilenetv2_025',
+        'lenet',
+        'minivgg',
+        'mobilenetv4_small',
+        # 'mobilenetv4_medium',
+        # 'mobilenetv4_large',
+    ]
     if args.models:
         models_to_run = args.models
     else:
@@ -369,12 +364,172 @@ Examples:
             print(f"Warning: Unknown model '{model_name}' - skipping.")
             continue
         for aug_type in args.aug:
+            start_time = time.time()
             result = train_with_augmentation(aug_type, args, device, model_name=model_name)
+            end_time = time.time()
+            # training time in minutes
+            train_time_mins = (end_time - start_time) / 60.0
+            result['train_time_mins'] = train_time_mins
+
+            # number of parameters (instantiate model on CPU briefly to count)
+            try:
+                tmp_model = create_model(model_name, num_classes=43, dropout_rate=0.5)
+                num_params = sum(p.numel() for p in tmp_model.parameters() if p.requires_grad)
+            except Exception:
+                tmp_model = None
+                num_params = None
+
+            # FLOPs (MACs) using thop if available
+            flops = None
+            try:
+                if _THOP_AVAILABLE and tmp_model is not None:
+                    dummy = torch.randn(1, 3, 48, 48)
+                    try:
+                        macs, params = thop_profile(tmp_model, inputs=(dummy,), verbose=False)
+                        flops = float(macs)
+                    except Exception:
+                        flops = None
+            except Exception:
+                flops = None
+
+            # Throughput (images/sec) and peak memory (GPU/CPU)
+            throughput = None
+            peak_gpu_bytes = None
+            peak_cpu_rss = None
+            try:
+                if tmp_model is not None:
+                    tmp_model.eval()
+                    # Use a device for throughput measurement
+                    measure_dev = device
+                    m = tmp_model.to(measure_dev)
+
+                    # Warm-up and timed runs
+                    warmup_iters = 10
+                    timed_iters = 100
+                    batch_size = max(1, int(args.batch_size))
+                    inp = torch.randn(batch_size, 3, 48, 48, device=measure_dev)
+
+                    # Reset GPU peak stats if available
+                    if measure_dev.type == 'cuda':
+                        torch.cuda.reset_peak_memory_stats(measure_dev)
+
+                    # CPU memory sampling setup
+                    if _PSUTIL_AVAILABLE:
+                        proc = psutil.Process()
+                        cpu_peak = 0
+
+                    with torch.no_grad():
+                        # warm-up
+                        for _ in range(warmup_iters):
+                            _ = m(inp)
+                        # timed
+                        if measure_dev.type == 'cuda':
+                            torch.cuda.synchronize(measure_dev)
+                        t0 = time.time()
+                        for _ in range(timed_iters):
+                            out = m(inp)
+                            if _PSUTIL_AVAILABLE:
+                                try:
+                                    rss = proc.memory_info().rss
+                                    if rss > cpu_peak:
+                                        cpu_peak = rss
+                                except Exception:
+                                    pass
+                        if measure_dev.type == 'cuda':
+                            torch.cuda.synchronize(measure_dev)
+                        t1 = time.time()
+
+                    duration = t1 - t0 if t1 > t0 else 1e-6
+                    throughput = (timed_iters * batch_size) / duration
+
+                    if measure_dev.type == 'cuda':
+                        try:
+                            peak_gpu_bytes = torch.cuda.max_memory_allocated(measure_dev)
+                        except Exception:
+                            peak_gpu_bytes = None
+
+                    if _PSUTIL_AVAILABLE:
+                        peak_cpu_rss = cpu_peak
+
+                    # cleanup
+                    try:
+                        m.cpu()
+                        del m
+                        torch.cuda.empty_cache()
+                    except Exception:
+                        pass
+            except Exception:
+                throughput = None
+                peak_gpu_bytes = None
+                peak_cpu_rss = None
+
+            result['num_parameters'] = num_params
+            result['flops_macs'] = flops
+            result['throughput_imgs_per_sec'] = throughput
+            result['peak_gpu_bytes'] = peak_gpu_bytes
+            result['peak_cpu_rss_bytes'] = peak_cpu_rss
+
+            # delete temporary model if present
+            try:
+                del tmp_model
+            except Exception:
+                pass
+
             all_results.append(result)
     
     # Compare results if multiple strategies or compare flag is set
     if len(all_results) > 1 or args.compare:
         compare_results(all_results)
+
+    # After training all models, write a concise summary to records/train_results.txt and print it
+    os.makedirs('records', exist_ok=True)
+
+    # Build a nicely aligned table for the training summary
+    header_title = f"Training Summary - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    col_fmt = "{:<20} {:<12} {:>14} {:>10} {:>11} {:>13} {:>11} {:>10} {:>15} {:>12} {:>12}"
+    cols = ["Model", "Augmentation", "Parameters", "Time(mins)", "BestVal(%)", "FinalTrain(%)", "FinalVal(%)", "FLOPs(G)", "Throughput(img/s)", "PeakGPU_MB", "PeakCPU_MB"]
+
+    summary_lines = [header_title, col_fmt.format(*cols), '-' * 138]
+
+    for r in all_results:
+        model_nm = r.get('model', 'unknown')
+        aug = r.get('augmentation', 'none')
+        params = r.get('num_parameters')
+        params_str = f"{params:,}" if params is not None else 'N/A'
+        tmins = r.get('train_time_mins')
+        tmins_str = f"{tmins:.2f}" if isinstance(tmins, (int, float)) else 'N/A'
+        best = r.get('best_val_acc')
+        ft = r.get('final_train_acc')
+        fv = r.get('final_val_acc')
+
+        best_str = f"{best:.2f}" if isinstance(best, (int, float)) else 'N/A'
+        ft_str = f"{ft:.2f}" if isinstance(ft, (int, float)) else 'N/A'
+        fv_str = f"{fv:.2f}" if isinstance(fv, (int, float)) else 'N/A'
+
+        # format optional metrics
+        flops_val = r.get('flops_macs')
+        if isinstance(flops_val, (int, float)):
+            flops_g = flops_val / 1e9
+            flops_str = f"{flops_g:.3f}"
+        else:
+            flops_str = 'N/A'
+
+        thr = r.get('throughput_imgs_per_sec')
+        thr_str = f"{thr:.2f}" if isinstance(thr, (int, float)) else 'N/A'
+
+        peak_gpu = r.get('peak_gpu_bytes')
+        peak_gpu_str = f"{(peak_gpu / (1024**2)):.1f}" if isinstance(peak_gpu, (int, float)) else 'N/A'
+
+        peak_cpu = r.get('peak_cpu_rss_bytes')
+        peak_cpu_str = f"{(peak_cpu / (1024**2)):.1f}" if isinstance(peak_cpu, (int, float)) else 'N/A'
+
+        line = col_fmt.format(model_nm, aug, params_str, tmins_str, best_str, ft_str, fv_str, flops_str, thr_str, peak_gpu_str, peak_cpu_str)
+        summary_lines.append(line)
+
+    summary_text = "\n".join(summary_lines)
+    print(summary_text)
+    with open('records/train_results.txt', 'w') as f:
+        f.write(summary_text + "\n")
 
 
 if __name__ == '__main__':

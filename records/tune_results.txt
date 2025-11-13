@@ -1,0 +1,26 @@
+Tune Results Summary - 2025-11-13 11:35:03
+File                                                           Accuracy   Selected
+------------------------------------------------------------------------------------------
+tuned_lenet_20251113_113442.pth                                 97.2456           
+tuned_lenet_20251113_113434.pth                                 96.6590           
+tuned_lenet_20251113_113455.pth                                 97.7302           
+tuned_lenet_20251113_113407.pth                                 87.4522           
+tuned_lenet_20251113_113418.pth                                 94.1341           
+tuned_lenet_20251113_113352.pth                                 52.5376           
+tuned_lenet_20251113_113355.pth                                 65.2385           
+tuned_lenet_20251113_113438.pth                                 97.0416           
+tuned_lenet_20251113_113359.pth                                 77.0212           
+tuned_lenet_20251113_113446.pth                                 97.2966           
+tuned_lenet_20251113_113414.pth                                 91.7368           
+tuned_lenet_20251113_113426.pth                                 95.7664           
+tuned_lenet_20251113_113459.pth                                 98.3678           
+tuned_lenet_20251113_113503.pth                                 98.3933        YES
+tuned_lenet_20251113_113403.pth                                 82.3514           
+tuned_lenet_20251113_113410.pth                                 90.2321           
+tuned_lenet_20251113_113450.pth                                 97.6537           
+tuned_lenet_20251113_113430.pth                                 96.2255           
+tuned_lenet_20251113_113422.pth                                 95.3583           
+tuned_lenet_20251113_113348.pth                                 38.0770           
+
+
+Copied best tuned model to: trained_models/best_lenet_tuned_lr0.0001_bs64_drop0.5_wd0.0001_presetbalanced.pth

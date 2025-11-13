@@ -83,9 +83,7 @@ class LeNet(nn.Module):
         }
 
 
-# ShallowCNN removed - keeping the codebase focused on the selected models (LeNet, MiniVGG,
-# MobileNetV2_025 and MobileNetV4). If you need the shallow baseline later it can be
-# reintroduced from version control.
+# ShallowCNN removed - keeping the codebase focused on the selected models.
 
 
 class MiniVGG(nn.Module):
@@ -152,8 +150,6 @@ class MiniVGG(nn.Module):
 
 
 # MobileNetV1 and depthwise separable conv helper removed to keep the repository
-# limited to LeNet, MiniVGG, MobileNetV2_025 and MobileNetV4 per request.
-
 
 class InvertedResidual(nn.Module):
     """Inverted Residual Block for MobileNetV2."""
@@ -419,66 +415,67 @@ class MobileNetV4(nn.Module):
                 ('uib', 0, 3, 1, 128, 4.0),
                 ('conv_bn', 1, 1, 640),
             ]
-        elif variant == 'medium':
-            return [
-                ('conv_bn', 3, 2, 32),
-                ('conv_bn', 3, 2, 128),
-                ('conv_bn', 1, 1, 48),
-                ('uib', 3, 5, 2, 80, 4.0),
-                ('uib', 3, 3, 1, 80, 2.0),
-                ('uib', 3, 5, 2, 160, 6.0),
-                ('uib', 3, 3, 1, 160, 4.0),
-                ('uib', 3, 0, 1, 160, 4.0),
-                ('uib', 0, 0, 1, 160, 2.0),
-                ('uib', 3, 0, 1, 160, 4.0),
-                ('uib', 5, 5, 2, 256, 6.0),
-                ('uib', 5, 5, 1, 256, 4.0),
-                ('uib', 3, 5, 1, 256, 4.0),
-                ('uib', 3, 5, 1, 256, 4.0),
-                ('uib', 0, 0, 1, 256, 4.0),
-                ('uib', 3, 0, 1, 256, 4.0),
-                ('uib', 3, 5, 1, 256, 2.0),
-                ('uib', 5, 5, 1, 256, 4.0),
-                ('uib', 0, 0, 1, 256, 4.0),
-                ('uib', 0, 0, 1, 256, 4.0),
-                ('uib', 5, 0, 1, 256, 2.0),
-                ('conv_bn', 1, 1, 960),
-            ]
-        elif variant == 'large':
-            return [
-                ('conv_bn', 3, 2, 24),
-                ('conv_bn', 3, 2, 96),
-                ('conv_bn', 1, 1, 48),
-                ('uib', 3, 5, 2, 96, 4.0),
-                ('uib', 3, 3, 1, 96, 4.0),
-                ('uib', 3, 5, 2, 192, 4.0),
-                ('uib', 3, 3, 1, 192, 4.0),
-                ('uib', 3, 3, 1, 192, 4.0),
-                ('uib', 3, 3, 1, 192, 4.0),
-                ('uib', 3, 5, 1, 192, 4.0),
-                ('uib', 5, 3, 1, 192, 4.0),
-                ('uib', 5, 3, 1, 192, 4.0),
-                ('uib', 5, 3, 1, 192, 4.0),
-                ('uib', 5, 3, 1, 192, 4.0),
-                ('uib', 5, 3, 1, 192, 4.0),
-                ('uib', 3, 0, 1, 192, 4.0),
-                ('uib', 5, 5, 2, 512, 4.0),
-                ('uib', 5, 5, 1, 512, 4.0),
-                ('uib', 5, 5, 1, 512, 4.0),
-                ('uib', 5, 5, 1, 512, 4.0),
-                ('uib', 5, 0, 1, 512, 4.0),
-                ('uib', 5, 3, 1, 512, 4.0),
-                ('uib', 5, 0, 1, 512, 4.0),
-                ('uib', 5, 0, 1, 512, 4.0),
-                ('uib', 5, 3, 1, 512, 4.0),
-                ('uib', 5, 5, 1, 512, 4.0),
-                ('uib', 5, 0, 1, 512, 4.0),
-                ('uib', 5, 0, 1, 512, 4.0),
-                ('uib', 5, 0, 1, 512, 4.0),
-                ('conv_bn', 1, 1, 960),
-            ]
+        # elif variant == 'medium':
+        #     return [
+        #         ('conv_bn', 3, 2, 32),
+        #         ('conv_bn', 3, 2, 128),
+        #         ('conv_bn', 1, 1, 48),
+        #         ('uib', 3, 5, 2, 80, 4.0),
+        #         ('uib', 3, 3, 1, 80, 2.0),
+        #         ('uib', 3, 5, 2, 160, 6.0),
+        #         ('uib', 3, 3, 1, 160, 4.0),
+        #         ('uib', 3, 0, 1, 160, 4.0),
+        #         ('uib', 0, 0, 1, 160, 2.0),
+        #         ('uib', 3, 0, 1, 160, 4.0),
+        #         ('uib', 5, 5, 2, 256, 6.0),
+        #         ('uib', 5, 5, 1, 256, 4.0),
+        #         ('uib', 3, 5, 1, 256, 4.0),
+        #         ('uib', 3, 5, 1, 256, 4.0),
+        #         ('uib', 0, 0, 1, 256, 4.0),
+        #         ('uib', 3, 0, 1, 256, 4.0),
+        #         ('uib', 3, 5, 1, 256, 2.0),
+        #         ('uib', 5, 5, 1, 256, 4.0),
+        #         ('uib', 0, 0, 1, 256, 4.0),
+        #         ('uib', 0, 0, 1, 256, 4.0),
+        #         ('uib', 5, 0, 1, 256, 2.0),
+        #         ('conv_bn', 1, 1, 960),
+        #     ]
+        # elif variant == 'large':
+        #     return [
+        #         ('conv_bn', 3, 2, 24),
+        #         ('conv_bn', 3, 2, 96),
+        #         ('conv_bn', 1, 1, 48),
+        #         ('uib', 3, 5, 2, 96, 4.0),
+        #         ('uib', 3, 3, 1, 96, 4.0),
+        #         ('uib', 3, 5, 2, 192, 4.0),
+        #         ('uib', 3, 3, 1, 192, 4.0),
+        #         ('uib', 3, 3, 1, 192, 4.0),
+        #         ('uib', 3, 3, 1, 192, 4.0),
+        #         ('uib', 3, 5, 1, 192, 4.0),
+        #         ('uib', 5, 3, 1, 192, 4.0),
+        #         ('uib', 5, 3, 1, 192, 4.0),
+        #         ('uib', 5, 3, 1, 192, 4.0),
+        #         ('uib', 5, 3, 1, 192, 4.0),
+        #         ('uib', 5, 3, 1, 192, 4.0),
+        #         ('uib', 3, 0, 1, 192, 4.0),
+        #         ('uib', 5, 5, 2, 512, 4.0),
+        #         ('uib', 5, 5, 1, 512, 4.0),
+        #         ('uib', 5, 5, 1, 512, 4.0),
+        #         ('uib', 5, 5, 1, 512, 4.0),
+        #         ('uib', 5, 0, 1, 512, 4.0),
+        #         ('uib', 5, 3, 1, 512, 4.0),
+        #         ('uib', 5, 0, 1, 512, 4.0),
+        #         ('uib', 5, 0, 1, 512, 4.0),
+        #         ('uib', 5, 3, 1, 512, 4.0),
+        #         ('uib', 5, 5, 1, 512, 4.0),
+        #         ('uib', 5, 0, 1, 512, 4.0),
+        #         ('uib', 5, 0, 1, 512, 4.0),
+        #         ('uib', 5, 0, 1, 512, 4.0),
+        #         ('conv_bn', 1, 1, 960),
+        #     ]
         else:
-            raise ValueError(f"Unknown variant: {variant}. Choose 'small', 'medium', or 'large'")
+            raise ValueError(f"Unknown variant: {variant}. Choose 'small' (other variants are commented out in source)")
+        
 
     def forward(self, x):
         x = self.features(x)
@@ -542,14 +539,14 @@ def create_model(model_name, num_classes=43, **kwargs):
         return MobileNetV2_025(num_classes=num_classes, **kwargs)
     elif model_name == 'mobilenetv4_small':
         return MobileNetV4(variant='small', num_classes=num_classes, **kwargs)
-    elif model_name == 'mobilenetv4_medium':
-        return MobileNetV4(variant='medium', num_classes=num_classes, **kwargs)
-    elif model_name == 'mobilenetv4_large':
-        return MobileNetV4(variant='large', num_classes=num_classes, **kwargs)
+    # elif model_name == 'mobilenetv4_medium':
+    #     return MobileNetV4(variant='medium', num_classes=num_classes, **kwargs)
+    # elif model_name == 'mobilenetv4_large':
+    #     return MobileNetV4(variant='large', num_classes=num_classes, **kwargs)
     else:
         raise ValueError(
             f"Unknown model: {model_name}. Available: 'lenet', 'minivgg', "
-            f"'mobilenetv2_025', 'mobilenetv4_small', 'mobilenetv4_medium', 'mobilenetv4_large'"
+            f"'mobilenetv2_025', 'mobilenetv4_small' (other variants are commented out)"
         )
 
 
@@ -562,8 +559,8 @@ if __name__ == '__main__':
         ('minivgg', {}),
         ('mobilenetv2_025', {}),
         ('mobilenetv4_small', {}),
-        ('mobilenetv4_medium', {}),
-        ('mobilenetv4_large', {}),
+        # ('mobilenetv4_medium', {}),
+        # ('mobilenetv4_large', {}),
     ]
     
     for model_name, kwargs in models_to_test:
@@ -587,6 +584,3 @@ if __name__ == '__main__':
     
     print("\n" + "=" * 60)
     print("Model factory test complete!")
-    # ('uib', 3, 3, 1, 160, 4.0),
-    # ('uib', 3, 5, 1, 160, 4.0),
-    # ('uib', 3, 3, 1, 160, 4.0),

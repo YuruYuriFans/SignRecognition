@@ -1,4 +1,10 @@
 Model: best_minivgg_basic
 Augmentation: basic
-Accuracy: 0.9778
-Macro F1: 0.9635
+Accuracy: 0.9819
+Macro F1: 0.9737
+Macro Precision: 0.9778
+Macro Recall: 0.9715
+Weighted F1: 0.9818
+Weighted Precision: 0.9824
+Weighted Recall: 0.9819
+Log Loss: 0.101425

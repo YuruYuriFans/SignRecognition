@@ -1,4 +1,0 @@
-Model: best_lenet_model_none
-Augmentation: none
-Accuracy: 0.9660
-Macro F1: 0.9515

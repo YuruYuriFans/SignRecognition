@@ -1,0 +1,85 @@
+Using device: cuda
+GPU: NVIDIA GeForce RTX 4060 Laptop GPU
+
+============================================================
+Found 4 model(s) for prediction.
+  1. best_lenet_basic.pth
+  2. best_minivgg_basic.pth
+  3. best_mobilenetv2_025_basic.pth
+  4. best_mobilenetv4_small_basic.pth
+============================================================
+
+============================================================
+Preparing test dataset...
+============================================================
+Loaded 12630 test images with ground truth
+Test dataset loaded. Ground Truth available: True
+
+Loading model from: best_lenet_basic.pth
+
+--- Starting Prediction for best_lenet_basic ---
+
+Predictions saved to: predictions/best_lenet_basic/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_lenet_basic/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_basic/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_basic ---
+
+
+Loading model from: best_minivgg_basic.pth
+
+--- Starting Prediction for best_minivgg_basic ---
+
+Predictions saved to: predictions/best_minivgg_basic/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_minivgg_basic/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_minivgg_basic/evaluation_metrics.txt
+--- Completed Prediction for best_minivgg_basic ---
+
+
+Loading model from: best_mobilenetv2_025_basic.pth
+
+--- Starting Prediction for best_mobilenetv2_025_basic ---
+
+Predictions saved to: predictions/best_mobilenetv2_025_basic/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_mobilenetv2_025_basic/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_mobilenetv2_025_basic/evaluation_metrics.txt
+--- Completed Prediction for best_mobilenetv2_025_basic ---
+
+
+Loading model from: best_mobilenetv4_small_basic.pth
+
+--- Starting Prediction for best_mobilenetv4_small_basic ---
+
+Predictions saved to: predictions/best_mobilenetv4_small_basic/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_mobilenetv4_small_basic/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_mobilenetv4_small_basic/evaluation_metrics.txt
+--- Completed Prediction for best_mobilenetv4_small_basic ---
+
+
+==========================================================================================
+MODEL PREDICTION COMPARISON SUMMARY
+==========================================================================================
+
+Model File                     Augmentation    Val Acc (Train)    Test Acc     Test F1   
+------------------------------------------------------------------------------------------
+best_minivgg_basic             basic           99.80%             0.9819       0.9737    
+best_lenet_basic               basic           99.72%             0.9635       0.9412    
+best_mobilenetv4_small_basic   basic           99.26%             0.9513       0.9253    
+best_mobilenetv2_025_basic     basic           98.32%             0.9083       0.8630    
+
+==========================================================================================
+Detailed prediction results saved to: predictions/prediction_summary_843333.json
+
+Best Model by Test Accuracy: best_minivgg_basic (0.9819)
+==========================================================================================
+Prediction Summary - 2025-11-13 10:03:08
+Model	Latency(ms)	Throughput(img/s)	FLOPs(G)	ModelSize(MB)	PeakGPU_MB	PeakCPU_MB	Status
+best_lenet_basic	0.534	119743.17	0.007	2.38	30.2	1188.0	Evaluation Complete
+best_minivgg_basic	2.048	31249.36	0.060	18.34	64.3	1305.9	Evaluation Complete
+best_mobilenetv2_025_basic	1.377	46465.11	0.002	0.21	25.9	1332.2	Evaluation Complete
+best_mobilenetv4_small_basic	3.118	20526.45	0.011	6.33	25.3	1376.1	Evaluation Complete
+
+✓ BATCH PREDICTION AND EVALUATION COMPLETED! All outputs are in the 'predictions/' directory.

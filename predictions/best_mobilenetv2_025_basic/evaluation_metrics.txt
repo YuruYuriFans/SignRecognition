@@ -1,0 +1,10 @@
+Model: best_mobilenetv2_025_basic
+Augmentation: basic
+Accuracy: 0.9083
+Macro F1: 0.8630
+Macro Precision: 0.8704
+Macro Recall: 0.8654
+Weighted F1: 0.9079
+Weighted Precision: 0.9113
+Weighted Recall: 0.9083
+Log Loss: 0.353716

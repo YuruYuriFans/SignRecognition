@@ -1,0 +1,37 @@
+Testing Model Factory
+============================================================
+
+Testing: lenet
+  Name: LeNet (3 Blocks)
+  Type: lenet
+  Parameters: 624,715
+  Dropout: 0.5
+  Forward pass: torch.Size([2, 3, 48, 48]) -> torch.Size([2, 43])
+  Status: OK
+
+Testing: minivgg
+  Name: Mini-VGG (2 Blocks)
+  Type: minivgg
+  Parameters: 4,806,731
+  Dropout: 0.5
+  Forward pass: torch.Size([2, 3, 48, 48]) -> torch.Size([2, 43])
+  Status: OK
+
+Testing: mobilenetv2_025
+  Name: MobileNetV2 (alpha=0.25)
+  Type: mobilenetv2_025
+  Parameters: 53,979
+  Dropout: 0.3
+  Forward pass: torch.Size([2, 3, 48, 48]) -> torch.Size([2, 43])
+  Status: OK
+
+Testing: mobilenetv4_small
+  Name: MobileNetV4-Small
+  Type: mobilenetv4_small
+  Parameters: 1,658,507
+  Dropout: 0.3
+  Forward pass: torch.Size([2, 3, 48, 48]) -> torch.Size([2, 43])
+  Status: OK
+
+============================================================
+Model factory test complete!

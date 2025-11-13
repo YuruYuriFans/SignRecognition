@@ -1,4 +1,0 @@
-Model: best_mobilenetv1_025_basic
-Augmentation: basic
-Accuracy: 0.9110
-Macro F1: 0.8694

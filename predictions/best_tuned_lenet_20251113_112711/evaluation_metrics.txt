@@ -1,0 +1,10 @@
+Model: best_tuned_lenet_20251113_112711
+Augmentation: basic
+Accuracy: 0.8789
+Macro F1: 0.8433
+Macro Precision: 0.8731
+Macro Recall: 0.8340
+Weighted F1: 0.8774
+Weighted Precision: 0.8846
+Weighted Recall: 0.8789
+Log Loss: 0.519486

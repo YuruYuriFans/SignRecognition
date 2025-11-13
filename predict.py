@@ -36,11 +36,27 @@ from tqdm import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.metrics import confusion_matrix, accuracy_score, log_loss
 from sklearn.metrics import precision_recall_fscore_support
 import glob
 import re
 import json
+import time
+
+# Optional profiling dependencies
+try:
+    from thop import profile as thop_profile
+    _THOP_AVAILABLE = True
+except Exception:
+    thop_profile = None
+    _THOP_AVAILABLE = False
+
+try:
+    import psutil
+    _PSUTIL_AVAILABLE = True
+except Exception:
+    psutil = None
+    _PSUTIL_AVAILABLE = False
 
 # --- Import Refactored Components ---
 # Use the model factory so we can load different architectures saved by the training script
@@ -146,6 +162,7 @@ def predict(model, test_loader, device, has_gt=False):
     """
     predictions = []
     all_labels = [] if has_gt else None
+    all_probs = [] if has_gt else None
     
     with torch.no_grad():
         for batch in tqdm(test_loader, desc='Predicting'):
@@ -167,20 +184,46 @@ def predict(model, test_loader, device, has_gt=False):
                     'confidence': confidences[i].item(),
                 }
                 predictions.append(pred_dict)
+            # collect probabilities for log-loss calculation (only if ground truth available)
+            if has_gt:
+                # probabilities is a tensor [batch, num_classes]
+                all_probs.extend(probabilities.cpu().numpy().tolist())
     
-    return predictions, all_labels
+    return predictions, all_labels, all_probs
 
 
-def calculate_metrics(y_true, y_pred):
-    """Calculate core metrics (accuracy, macro F1)."""
+def calculate_metrics(y_true, y_pred, y_prob=None):
+    """Calculate core metrics:
+    - accuracy
+    - macro F1, macro precision, macro recall
+    - weighted F1, weighted precision, weighted recall
+    - log-loss (if probabilities provided)
+
+    Returns (accuracy, f1_macro, precision_macro, recall_macro,
+             f1_weighted, precision_weighted, recall_weighted, logloss)
+    """
     accuracy = accuracy_score(y_true, y_pred)
-    
-    # Calculate macro-averaged F1 score
-    _, _, f1_macro, _ = precision_recall_fscore_support(
+
+    # Macro-averaged metrics
+    precision_macro, recall_macro, f1_macro, _ = precision_recall_fscore_support(
         y_true, y_pred, labels=range(43), average='macro', zero_division=0
     )
-    
-    return accuracy, f1_macro
+
+    # Weighted-averaged metrics
+    precision_weighted, recall_weighted, f1_weighted, _ = precision_recall_fscore_support(
+        y_true, y_pred, labels=range(43), average='weighted', zero_division=0
+    )
+
+    # Log loss (cross-entropy) if probabilities provided
+    logloss = None
+    if y_prob is not None:
+        try:
+            # y_prob should be shape (n_samples, n_classes)
+            logloss = float(log_loss(y_true, y_prob, labels=list(range(y_prob.shape[1]))))
+        except Exception:
+            logloss = None
+
+    return accuracy, f1_macro, precision_macro, recall_macro, f1_weighted, precision_weighted, recall_weighted, logloss
 
 
 def plot_confusion_matrix(y_true, y_pred, output_path, num_classes=43):
@@ -220,8 +263,83 @@ def predict_and_evaluate_single(model_path, test_loader, device, has_gt, output_
     
     print(f"\n--- Starting Prediction for {model_name_safe} ---")
     
+    # Profiling: FLOPs, latency, throughput, model size, peak memory
+    profiling = {
+        'flops_macs': None,
+        'latency_sec': None,
+        'throughput_imgs_per_sec': None,
+        'model_size_bytes': None,
+        'peak_gpu_bytes': None,
+        'peak_cpu_rss_bytes': None,
+    }
+
+    try:
+        # Model size (bytes)
+        total_bytes = 0
+        for p in model.parameters():
+            total_bytes += p.numel() * p.element_size()
+        profiling['model_size_bytes'] = int(total_bytes)
+
+        # FLOPs via thop (if available)
+        if _THOP_AVAILABLE:
+            try:
+                dummy = torch.randn(1, 3, 48, 48).to(device)
+                macs, params = thop_profile(model, inputs=(dummy,), verbose=False)
+                profiling['flops_macs'] = float(macs)
+            except Exception:
+                profiling['flops_macs'] = None
+
+        # Throughput and latency measurement
+        batch_size = getattr(test_loader, 'batch_size', 64) or 64
+        warmup_iters = 10
+        timed_iters = 100
+        inp = torch.randn(batch_size, 3, 48, 48, device=device)
+
+        if device.type == 'cuda':
+            torch.cuda.reset_peak_memory_stats(device)
+
+        cpu_peak = 0
+        proc = psutil.Process() if _PSUTIL_AVAILABLE else None
+
+        model.eval()
+        with torch.no_grad():
+            # warm-up
+            for _ in range(warmup_iters):
+                _ = model(inp)
+            if device.type == 'cuda':
+                torch.cuda.synchronize(device)
+            t0 = time.time()
+            for _ in range(timed_iters):
+                _ = model(inp)
+                if _PSUTIL_AVAILABLE:
+                    try:
+                        rss = proc.memory_info().rss
+                        if rss > cpu_peak:
+                            cpu_peak = rss
+                    except Exception:
+                        pass
+            if device.type == 'cuda':
+                torch.cuda.synchronize(device)
+            t1 = time.time()
+
+        duration = max(1e-6, t1 - t0)
+        profiling['throughput_imgs_per_sec'] = (timed_iters * batch_size) / duration
+        profiling['latency_sec'] = duration / timed_iters
+
+        if device.type == 'cuda':
+            try:
+                profiling['peak_gpu_bytes'] = torch.cuda.max_memory_allocated(device)
+            except Exception:
+                profiling['peak_gpu_bytes'] = None
+
+        if _PSUTIL_AVAILABLE:
+            profiling['peak_cpu_rss_bytes'] = cpu_peak
+
+    except Exception as e:
+        print(f"Profiling failed for {model_path}: {e}")
+
     # 2. Make Predictions
-    predictions, ground_truth = predict(model, test_loader, device, has_gt)
+    predictions, ground_truth, all_probs = predict(model, test_loader, device, has_gt)
     
     # 3. Save Predictions (simplified version for now)
     csv_path = os.path.join(output_dir, 'predictions.csv')
@@ -235,26 +353,49 @@ def predict_and_evaluate_single(model_path, test_loader, device, has_gt, output_
     # 4. Evaluate if ground truth available
     if has_gt and ground_truth is not None:
         y_pred = [p['predicted_class'] for p in predictions]
-        
-        # Calculate core metrics
-        accuracy, f1_macro = calculate_metrics(ground_truth, y_pred)
-        
+        # prepare probability matrix if available
+        y_prob = None
+        if all_probs is not None and len(all_probs) == len(y_pred):
+            try:
+                y_prob = np.asarray(all_probs)
+            except Exception:
+                y_prob = None
+
+        # Calculate core metrics (accuracy, macro and weighted metrics, logloss)
+        (accuracy, f1_macro, prec_macro, rec_macro,
+         f1_weighted, prec_weighted, rec_weighted, logloss) = calculate_metrics(ground_truth, y_pred, y_prob)
+
         # Save plots/detailed metrics
         plot_confusion_matrix(ground_truth, y_pred, os.path.join(output_dir, 'confusion_matrix.png'))
-        
-        # Detailed metrics text file (re-using original logic but simplifying for brevity)
+
+        # Detailed metrics text file (extended)
         metrics_path = os.path.join(output_dir, 'evaluation_metrics.txt')
         with open(metrics_path, 'w') as f:
             f.write(f"Model: {model_name_safe}\n")
             f.write(f"Augmentation: {info['augmentation']}\n")
             f.write(f"Accuracy: {accuracy:.4f}\n")
             f.write(f"Macro F1: {f1_macro:.4f}\n")
-        
+            f.write(f"Macro Precision: {prec_macro:.4f}\n")
+            f.write(f"Macro Recall: {rec_macro:.4f}\n")
+            f.write(f"Weighted F1: {f1_weighted:.4f}\n")
+            f.write(f"Weighted Precision: {prec_weighted:.4f}\n")
+            f.write(f"Weighted Recall: {rec_weighted:.4f}\n")
+            if logloss is not None:
+                f.write(f"Log Loss: {logloss:.6f}\n")
+            else:
+                f.write("Log Loss: N/A\n")
+
         print(f"Evaluation metrics saved to: {metrics_path}")
-        
+
         info.update({
             'test_accuracy': accuracy,
             'test_macro_f1': f1_macro,
+            'test_macro_precision': prec_macro,
+            'test_macro_recall': rec_macro,
+            'test_weighted_f1': f1_weighted,
+            'test_weighted_precision': prec_weighted,
+            'test_weighted_recall': rec_weighted,
+            'test_log_loss': logloss,
             'status': 'Evaluation Complete',
         })
     else:
@@ -263,6 +404,9 @@ def predict_and_evaluate_single(model_path, test_loader, device, has_gt, output_
             'test_macro_f1': 'N/A',
             'status': 'Prediction Complete (No GT)',
         })
+
+    # Attach profiling info to returned info
+    info.update(profiling)
 
     print(f"--- Completed Prediction for {model_name_safe} ---\n")
     info['model_filename'] = model_name_safe
@@ -289,20 +433,36 @@ def compare_results(all_results):
     evaluated_results.sort(key=lambda x: x['test_accuracy'], reverse=True)
     
     # Print table header
-    print(f"{'Model File':<30} {'Augmentation':<15} {'Val Acc (Train)':<18} {'Test Acc':<12} {'Test F1':<10}")
-    print(f"{'-'*90}")
+    print(f"{'Model File':<30} {'Augmentation':<15} {'Val Acc (Train)':<18} {'Test Acc':<12} {'Test F1':<8} {'Test Prec':<10} {'Test Rec':<9} {'W-F1':<8} {'W-Prec':<10} {'W-Rec':<9} {'LogLoss':<10}")
+    print(f"{'-'*140}")
     
     # Print results for each model
     for result in evaluated_results:
-        val_acc_str = f"{result['accuracy']:.2f}%" if result.get('accuracy') is not None else 'N/A'
-        test_acc_str = f"{result['test_accuracy']:.4f}"
-        test_f1_str = f"{result['test_macro_f1']:.4f}"
-        
-        print(f"{result['model_filename']:<30} "
-              f"{result['augmentation']:<15} "
-              f"{val_acc_str:<18} "
-              f"{test_acc_str:<12} "
-              f"{test_f1_str:<10}")
+      val_acc_str = f"{result['accuracy']:.2f}%" if result.get('accuracy') is not None else 'N/A'
+      test_acc_str = f"{result['test_accuracy']:.4f}"
+      test_f1_str = f"{result.get('test_macro_f1', 'N/A'):.4f}" if isinstance(result.get('test_macro_f1'), (int, float)) else 'N/A'
+      test_prec_str = f"{result.get('test_macro_precision', 'N/A'):.4f}" if isinstance(result.get('test_macro_precision'), (int, float)) else 'N/A'
+      test_rec_str = f"{result.get('test_macro_recall', 'N/A'):.4f}" if isinstance(result.get('test_macro_recall'), (int, float)) else 'N/A'
+      wf1 = result.get('test_weighted_f1')
+      wf1_str = f"{wf1:.4f}" if isinstance(wf1, (int, float)) else 'N/A'
+      wprec = result.get('test_weighted_precision')
+      wprec_str = f"{wprec:.4f}" if isinstance(wprec, (int, float)) else 'N/A'
+      wrec = result.get('test_weighted_recall')
+      wrec_str = f"{wrec:.4f}" if isinstance(wrec, (int, float)) else 'N/A'
+      logloss_val = result.get('test_log_loss')
+      logloss_str = f"{logloss_val:.6f}" if isinstance(logloss_val, (int, float)) else 'N/A'
+
+      print(f"{result['model_filename']:<30} "
+          f"{result['augmentation']:<15} "
+          f"{val_acc_str:<18} "
+          f"{test_acc_str:<12} "
+          f"{test_f1_str:<8} "
+          f"{test_prec_str:<10} "
+          f"{test_rec_str:<9} "
+          f"{wf1_str:<8} "
+          f"{wprec_str:<10} "
+          f"{wrec_str:<9} "
+          f"{logloss_str:<10}")
 
     print(f"\n{'='*90}")
 
@@ -391,7 +551,63 @@ def main():
     elif not has_gt:
         print("\nEvaluation metrics are not available as the ground truth file was not found.")
         compare_results(all_results) # Still print the summary table of predictions
-    
+
+    # Write prediction profiling summary to records/predicting_results.txt and print
+    os.makedirs('records', exist_ok=True)
+
+    # Nicely formatted prediction summary table
+    header_title = f"Prediction Summary - {time.strftime('%Y-%m-%d %H:%M:%S')}"
+    col_fmt = "{:<30} {:>12} {:>16} {:>10} {:>14} {:>12} {:>12} {:>10} {:>8} {:>8} {:>8} {:>8} {:>10} {:<20}"
+    cols = ["Model", "Latency(ms)", "Throughput(img/s)", "FLOPs(G)", "ModelSize(MB)", "PeakGPU_MB", "PeakCPU_MB",
+        "TestAcc", "TestF1", "TestPrec", "TestRec", "W-F1", "W-Prec", "W-Rec", "LogLoss", "Status"]
+
+    summary_lines = [header_title, col_fmt.format(*cols), '-' * 150]
+    for r in all_results:
+        name = r.get('model_filename', r.get('model', 'unknown'))
+        latency = r.get('latency_sec')
+        latency_str = f"{latency*1000:.3f}" if isinstance(latency, (int, float)) else 'N/A'
+        thr = r.get('throughput_imgs_per_sec')
+        thr_str = f"{thr:.2f}" if isinstance(thr, (int, float)) else 'N/A'
+        flops = r.get('flops_macs')
+        flops_str = f"{(flops/1e9):.3f}" if isinstance(flops, (int, float)) else 'N/A'
+        size = r.get('model_size_bytes')
+        size_str = f"{(size/(1024**2)):.2f}" if isinstance(size, (int, float)) else 'N/A'
+        peak_gpu = r.get('peak_gpu_bytes')
+        peak_gpu_str = f"{(peak_gpu/(1024**2)):.1f}" if isinstance(peak_gpu, (int, float)) else 'N/A'
+        peak_cpu = r.get('peak_cpu_rss_bytes')
+        peak_cpu_str = f"{(peak_cpu/(1024**2)):.1f}" if isinstance(peak_cpu, (int, float)) else 'N/A'
+
+        # Test metrics (macro and weighted)
+        test_acc = r.get('test_accuracy')
+        test_acc_str = f"{test_acc:.4f}" if isinstance(test_acc, (int, float)) else 'N/A'
+        f1 = r.get('test_macro_f1')
+        f1_str = f"{f1:.4f}" if isinstance(f1, (int, float)) else 'N/A'
+        prec = r.get('test_macro_precision')
+        prec_str = f"{prec:.4f}" if isinstance(prec, (int, float)) else 'N/A'
+        rec = r.get('test_macro_recall')
+        rec_str = f"{rec:.4f}" if isinstance(rec, (int, float)) else 'N/A'
+
+        wf1 = r.get('test_weighted_f1')
+        wf1_str = f"{wf1:.4f}" if isinstance(wf1, (int, float)) else 'N/A'
+        wprec = r.get('test_weighted_precision')
+        wprec_str = f"{wprec:.4f}" if isinstance(wprec, (int, float)) else 'N/A'
+        wrec = r.get('test_weighted_recall')
+        wrec_str = f"{wrec:.4f}" if isinstance(wrec, (int, float)) else 'N/A'
+
+        logl = r.get('test_log_loss')
+        logl_str = f"{logl:.6f}" if isinstance(logl, (int, float)) else 'N/A'
+
+        status = r.get('status', 'N/A')
+
+        line = col_fmt.format(name, latency_str, thr_str, flops_str, size_str, peak_gpu_str, peak_cpu_str,
+                      test_acc_str, f1_str, prec_str, rec_str, wf1_str, wprec_str, wrec_str, logl_str, status)
+        summary_lines.append(line)
+
+    summary_text = "\n".join(summary_lines)
+    print(summary_text)
+    with open('records/predicting_results.txt', 'w') as f:
+        f.write(summary_text + "\n")
+
     print(f"\n✓ BATCH PREDICTION AND EVALUATION COMPLETED! All outputs are in the '{output_base_dir}/' directory.")
 
 if __name__ == '__main__':
