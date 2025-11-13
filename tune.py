@@ -115,34 +115,34 @@ def main():
 
 	# Pre-defined presets (defaults for runs without explicit numeric params)
 	presets = {
-		'fast': {
-			'epochs': 5,
-			'batch_size': 128,
-			'lr': 1e-3,
-			'dropout': 0.5,
-			'weight_decay': 1e-5,
-			'patience': 2,
-			'min_delta': 0.0,
-		},
-		'balanced': {
-			'epochs': 20,
-			'batch_size': 64,
-			'lr': 1e-4,
-			'dropout': 0.5,
-			'weight_decay': 1e-4,
-			'patience': 5,
-			'min_delta': 0.01,
-		},
-		'conservative': {
-			'epochs': 40,
-			'batch_size': 32,
-			'lr': 5e-5,
-			'dropout': 0.5,
-			'weight_decay': 5e-4,
-			'patience': 8,
-			'min_delta': 0.01,
-		}
-	}
+    'fast': {
+        'epochs': 5,
+        'batch_size': 128,
+        'lr': 5e-4,
+        'dropout': 0.3,
+        'weight_decay': 1e-5,
+        'patience': 2,
+        'min_delta': 0.0,
+    },
+    'balanced': {
+        'epochs': 20,
+        'batch_size': 128,
+        'lr': 2e-4,
+        'dropout': 0.5,
+        'weight_decay': 1e-5,
+        'patience': 6,
+        'min_delta': 0.001,
+    },
+    'conservative': {
+        'epochs': 50,
+        'batch_size': 32,
+        'lr': 5e-5,
+        'dropout': 0.5,
+        'weight_decay': 1e-4,
+        'patience': 8,
+        'min_delta': 0.01,
+    }
+}
 
 	# Apply preset values only for the parameters not explicitly provided (i.e., still None)
 	preset_values = presets.get(args.preset, presets['balanced'])

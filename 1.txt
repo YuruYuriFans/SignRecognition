@@ -1,6 +1,154 @@
-Predicting:   0%|          | 0/198 [00:00<?, ?it/s]Predicting:   1%|          | 1/198 [00:00<01:31,  2.14it/s]Predicting:   8%|▊         | 16/198 [00:00<00:05, 35.65it/s]Predicting:  13%|█▎        | 26/198 [00:00<00:03, 50.99it/s]Predicting:  19%|█▊        | 37/198 [00:00<00:02, 66.11it/s]Predicting:  24%|██▎       | 47/198 [00:00<00:02, 72.80it/s]Predicting:  29%|██▉       | 57/198 [00:01<00:01, 79.37it/s]Predicting:  34%|███▍      | 67/198 [00:01<00:01, 83.91it/s]Predicting:  39%|███▉      | 77/198 [00:01<00:01, 87.71it/s]Predicting:  44%|████▍     | 87/198 [00:01<00:01, 89.23it/s]Predicting:  49%|████▉     | 97/198 [00:01<00:01, 91.07it/s]Predicting:  54%|█████▍    | 107/198 [00:01<00:00, 93.00it/s]Predicting:  59%|█████▉    | 117/198 [00:01<00:00, 93.97it/s]Predicting:  64%|██████▍   | 127/198 [00:01<00:00, 94.72it/s]Predicting:  70%|██████▉   | 138/198 [00:01<00:00, 94.70it/s]Predicting:  75%|███████▍  | 148/198 [00:01<00:00, 95.51it/s]Predicting:  80%|███████▉  | 158/198 [00:02<00:00, 96.04it/s]Predicting:  85%|████████▍ | 168/198 [00:02<00:00, 96.63it/s]Predicting:  90%|████████▉ | 178/198 [00:02<00:00, 93.16it/s]Predicting:  95%|█████████▍| 188/198 [00:02<00:00, 94.49it/s]Predicting: 100%|██████████| 198/198 [00:02<00:00, 79.71it/s]
-qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
-Predicting:   0%|          | 0/198 [00:00<?, ?it/s]Predicting:   1%|          | 2/198 [00:00<00:09, 19.99it/s]Predicting:   8%|▊         | 15/198 [00:00<00:02, 83.05it/s]Predicting:  15%|█▍        | 29/198 [00:00<00:01, 104.70it/s]Predicting:  22%|██▏       | 43/198 [00:00<00:01, 115.00it/s]Predicting:  29%|██▉       | 57/198 [00:00<00:01, 120.89it/s]Predicting:  36%|███▌      | 71/198 [00:00<00:01, 124.57it/s]Predicting:  43%|████▎     | 85/198 [00:00<00:00, 127.07it/s]Predicting:  50%|█████     | 99/198 [00:00<00:00, 128.74it/s]Predicting:  57%|█████▋    | 113/198 [00:00<00:00, 130.30it/s]Predicting:  64%|██████▍   | 127/198 [00:01<00:00, 131.57it/s]Predicting:  71%|███████   | 141/198 [00:01<00:00, 132.03it/s]Predicting:  78%|███████▊  | 155/198 [00:01<00:00, 131.91it/s]Predicting:  85%|████████▌ | 169/198 [00:01<00:00, 130.60it/s]Predicting:  92%|█████████▏| 183/198 [00:01<00:00, 131.68it/s]Predicting:  99%|█████████▉| 197/198 [00:01<00:00, 132.13it/s]Predicting: 100%|██████████| 198/198 [00:01<00:00, 122.38it/s]
-Predicting:   0%|          | 0/198 [00:00<?, ?it/s]Predicting:   2%|▏         | 4/198 [00:00<00:04, 39.96it/s]Predicting:   9%|▊         | 17/198 [00:00<00:01, 90.66it/s]Predicting:  15%|█▌        | 30/198 [00:00<00:01, 107.71it/s]Predicting:  22%|██▏       | 43/198 [00:00<00:01, 112.76it/s]Predicting:  28%|██▊       | 56/198 [00:00<00:01, 117.92it/s]Predicting:  34%|███▍      | 68/198 [00:00<00:01, 118.33it/s]Predicting:  41%|████      | 81/198 [00:00<00:00, 119.55it/s]Predicting:  48%|████▊     | 95/198 [00:00<00:00, 123.65it/s]Predicting:  55%|█████▍    | 108/198 [00:00<00:00, 122.68it/s]Predicting:  61%|██████    | 121/198 [00:01<00:00, 120.62it/s]Predicting:  68%|██████▊   | 135/198 [00:01<00:00, 124.04it/s]Predicting:  75%|███████▍  | 148/198 [00:01<00:00, 121.13it/s]Predicting:  81%|████████▏ | 161/198 [00:01<00:00, 122.66it/s]Predicting:  88%|████████▊ | 175/198 [00:01<00:00, 124.90it/s]Predicting:  95%|█████████▌| 189/198 [00:01<00:00, 125.04it/s]Predicting: 100%|██████████| 198/198 [00:01<00:00, 117.82it/s]
-Predicting:   0%|          | 0/198 [00:00<?, ?it/s]Predicting:   1%|          | 1/198 [00:00<00:29,  6.68it/s]Predicting:   9%|▊         | 17/198 [00:00<00:02, 80.37it/s]Predicting:  16%|█▌        | 31/198 [00:00<00:01, 103.71it/s]Predicting:  23%|██▎       | 45/198 [00:00<00:01, 114.18it/s]Predicting:  30%|██▉       | 59/198 [00:00<00:01, 118.98it/s]Predicting:  37%|███▋      | 73/198 [00:00<00:01, 123.82it/s]Predicting:  44%|████▍     | 87/198 [00:00<00:00, 125.80it/s]Predicting:  51%|█████     | 100/198 [00:00<00:00, 126.95it/s]Predicting:  57%|█████▋    | 113/198 [00:00<00:00, 127.71it/s]Predicting:  64%|██████▍   | 127/198 [00:01<00:00, 128.60it/s]Predicting:  71%|███████   | 141/198 [00:01<00:00, 128.74it/s]Predicting:  78%|███████▊  | 154/198 [00:01<00:00, 126.67it/s]Predicting:  84%|████████▍ | 167/198 [00:01<00:00, 125.49it/s]Predicting:  91%|█████████ | 180/198 [00:01<00:00, 125.98it/s]Predicting:  98%|█████████▊| 194/198 [00:01<00:00, 128.23it/s]Predicting: 100%|██████████| 198/198 [00:01<00:00, 117.87it/s]
-Predicting:   0%|          | 0/198 [00:00<?, ?it/s]Predicting:   1%|          | 1/198 [00:00<00:20,  9.65it/s]Predicting:   9%|▉         | 18/198 [00:00<00:01, 96.45it/s]Predicting:  16%|█▌        | 32/198 [00:00<00:01, 113.60it/s]Predicting:  23%|██▎       | 46/198 [00:00<00:01, 120.42it/s]Predicting:  30%|███       | 60/198 [00:00<00:01, 124.17it/s]Predicting:  37%|███▋      | 74/198 [00:00<00:00, 125.58it/s]Predicting:  44%|████▍     | 88/198 [00:00<00:00, 126.94it/s]Predicting:  51%|█████     | 101/198 [00:00<00:00, 125.23it/s]Predicting:  58%|█████▊    | 114/198 [00:00<00:00, 121.95it/s]Predicting:  65%|██████▍   | 128/198 [00:01<00:00, 123.85it/s]Predicting:  72%|███████▏  | 142/198 [00:01<00:00, 125.58it/s]Predicting:  79%|███████▉  | 156/198 [00:01<00:00, 126.69it/s]Predicting:  86%|████████▌ | 170/198 [00:01<00:00, 128.44it/s]Predicting:  92%|█████████▏| 183/198 [00:01<00:00, 121.43it/s]Predicting:  99%|█████████▉| 196/198 [00:01<00:00, 121.85it/s]Predicting: 100%|██████████| 198/198 [00:01<00:00, 118.76it/s]
+Using device: cuda
+GPU: NVIDIA GeForce RTX 4060 Laptop GPU
+
+============================================================
+Found 8 model(s) for prediction.
+  1. best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910.pth
+  2. best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced.pth
+  3. best_lenet_basic.pth
+  4. best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915.pth
+  5. best_minivgg_basic.pth
+  6. best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918.pth
+  7. best_mobilenetv2_025_basic.pth
+  8. best_mobilenetv4_small_basic.pth
+============================================================
+
+============================================================
+Preparing test dataset...
+============================================================
+Loaded 12630 test images with ground truth
+Test dataset loaded. Ground Truth available: True
+
+Loading model from: best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910.pth
+State dict load (strict) failed: Error(s) in loading state_dict for LeNet:
+	Missing key(s) in state_dict: "conv1.weight", "conv1.bias", "conv2.weight", "conv2.bias", "conv3.weight", "conv3.bias", "fc1.weight", "fc1.bias", "fc2.weight", "fc2.bias". 
+	Unexpected key(s) in state_dict: "total_ops", "total_params", "feature_extractor.0.weight", "feature_extractor.0.bias", "feature_extractor.3.weight", "feature_extractor.3.bias", "classifier.0.weight", "classifier.0.bias", "classifier.3.weight", "classifier.3.bias". 
+Retrying with strict=False...
+
+--- Starting Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910 ---
+
+Predictions saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910 ---
+
+
+Loading model from: best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced.pth
+
+--- Starting Prediction for best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced ---
+
+Predictions saved to: predictions/best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced ---
+
+
+Loading model from: best_lenet_basic.pth
+
+--- Starting Prediction for best_lenet_basic ---
+
+Predictions saved to: predictions/best_lenet_basic/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_lenet_basic/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_basic/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_basic ---
+
+
+Loading model from: best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915.pth
+State dict load (strict) failed: Error(s) in loading state_dict for LeNet:
+	Missing key(s) in state_dict: "conv1.weight", "conv1.bias", "conv2.weight", "conv2.bias", "conv3.weight", "conv3.bias", "fc1.weight", "fc1.bias", "fc2.weight", "fc2.bias". 
+	Unexpected key(s) in state_dict: "total_ops", "total_params", "feature_extractor.0.weight", "feature_extractor.0.bias", "feature_extractor.3.weight", "feature_extractor.3.bias", "feature_extractor.6.weight", "feature_extractor.6.bias", "classifier.0.weight", "classifier.0.bias", "classifier.3.weight", "classifier.3.bias". 
+Retrying with strict=False...
+
+--- Starting Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915 ---
+
+Predictions saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915 ---
+
+
+Loading model from: best_minivgg_basic.pth
+
+--- Starting Prediction for best_minivgg_basic ---
+
+Predictions saved to: predictions/best_minivgg_basic/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_minivgg_basic/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_minivgg_basic/evaluation_metrics.txt
+--- Completed Prediction for best_minivgg_basic ---
+
+
+Loading model from: best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918.pth
+State dict load (strict) failed: Error(s) in loading state_dict for LeNet:
+	Missing key(s) in state_dict: "conv1.weight", "conv1.bias", "conv2.weight", "conv2.bias", "conv3.weight", "conv3.bias", "fc1.weight", "fc1.bias", "fc2.weight", "fc2.bias". 
+	Unexpected key(s) in state_dict: "total_ops", "total_params", "feature_extractor.0.weight", "feature_extractor.0.bias", "feature_extractor.3.weight", "feature_extractor.3.bias", "feature_extractor.6.weight", "feature_extractor.6.bias", "classifier.0.weight", "classifier.0.bias", "classifier.3.weight", "classifier.3.bias". 
+Retrying with strict=False...
+
+--- Starting Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918 ---
+
+Predictions saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918 ---
+
+
+Loading model from: best_mobilenetv2_025_basic.pth
+
+--- Starting Prediction for best_mobilenetv2_025_basic ---
+
+Predictions saved to: predictions/best_mobilenetv2_025_basic/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_mobilenetv2_025_basic/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_mobilenetv2_025_basic/evaluation_metrics.txt
+--- Completed Prediction for best_mobilenetv2_025_basic ---
+
+
+Loading model from: best_mobilenetv4_small_basic.pth
+
+--- Starting Prediction for best_mobilenetv4_small_basic ---
+
+Predictions saved to: predictions/best_mobilenetv4_small_basic/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_mobilenetv4_small_basic/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_mobilenetv4_small_basic/evaluation_metrics.txt
+--- Completed Prediction for best_mobilenetv4_small_basic ---
+
+
+==========================================================================================
+MODEL PREDICTION COMPARISON SUMMARY
+==========================================================================================
+
+Model File                     Augmentation    Val Acc (Train)    Test Acc     Test F1  Test Prec  Test Rec  W-F1     W-Prec     W-Rec     LogLoss   
+--------------------------------------------------------------------------------------------------------------------------------------------
+best_minivgg_basic             basic           99.80%             0.9819       0.9737   0.9778     0.9715    0.9818   0.9824     0.9819    0.101425  
+best_lenet_basic               basic           99.72%             0.9635       0.9412   0.9472     0.9432    0.9629   0.9651     0.9635    0.171329  
+best_mobilenetv4_small_basic   basic           99.26%             0.9513       0.9253   0.9293     0.9258    0.9508   0.9523     0.9513    0.210475  
+best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced basic           99.23%             0.9146       0.8774   0.8936     0.8780    0.9138   0.9186     0.9146    0.440767  
+best_mobilenetv2_025_basic     basic           98.32%             0.9083       0.8630   0.8704     0.8654    0.9079   0.9113     0.9083    0.353716  
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915 N/A             30.20%             0.0447       0.0027   0.0015     0.0196    0.0058   0.0032     0.0447    3.756683  
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918 N/A             41.21%             0.0095       0.0004   0.0002     0.0233    0.0002   0.0001     0.0095    3.760678  
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910 N/A             43.46%             0.0071       0.0003   0.0002     0.0233    0.0001   0.0001     0.0071    3.760236  
+
+==========================================================================================
+Detailed prediction results saved to: predictions/prediction_summary_14613.json
+
+Best Model by Test Accuracy: best_minivgg_basic (0.9819)
+==========================================================================================
+Prediction Summary - 2025-11-13 12:40:15
+Model                           Latency(ms) Throughput(img/s)   FLOPs(G)  ModelSize(MB)   PeakGPU_MB   PeakCPU_MB    TestAcc   TestF1 TestPrec  TestRec     W-F1     W-Prec W-Rec               
+------------------------------------------------------------------------------------------------------------------------------------------------------
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910        0.532        120219.92      0.007           2.38         30.2       1175.3     0.0071   0.0003   0.0002   0.0233   0.0001     0.0001 0.0071              
+best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced        0.559        114488.01      0.007           2.38         30.2       1303.0     0.9146   0.8774   0.8936   0.8780   0.9138     0.9186 0.9146              
+best_lenet_basic                      0.559        114399.70      0.007           2.38         30.2       1345.2     0.9635   0.9412   0.9472   0.9432   0.9629     0.9651 0.9635              
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915        0.537        119225.16      0.007           2.38         30.2       1372.1     0.0447   0.0027   0.0015   0.0196   0.0058     0.0032 0.0447              
+best_minivgg_basic                    2.244         28516.31      0.060          18.34         64.3       1391.9     0.9819   0.9737   0.9778   0.9715   0.9818     0.9824 0.9819              
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918        0.535        119653.50      0.007           2.38         30.2       1347.3     0.0095   0.0004   0.0002   0.0233   0.0002     0.0001 0.0095              
+best_mobilenetv2_025_basic            1.444         44332.93      0.002           0.21         25.9       1367.7     0.9083   0.8630   0.8704   0.8654   0.9079     0.9113 0.9083              
+best_mobilenetv4_small_basic          3.391         18870.72      0.011           6.33         25.3       1407.9     0.9513   0.9253   0.9293   0.9258   0.9508     0.9523 0.9513              
+
+✓ BATCH PREDICTION AND EVALUATION COMPLETED! All outputs are in the 'predictions/' directory.

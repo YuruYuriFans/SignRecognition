@@ -83,6 +83,99 @@ class LeNet(nn.Module):
         }
 
 
+def build_lenet_variant(num_conv_layers=3,
+                        conv_channels=None,
+                        kernel_sizes=None,
+                        fc_sizes=None,
+                        activation='relu',
+                        dropout=0.5,
+                        num_classes=43):
+    """Build a parametric LeNet-like model.
+
+    Args:
+        num_conv_layers (int): number of conv blocks to include (1-3+)
+        conv_channels (list[int]): output channels per conv block
+        kernel_sizes (list[int]): kernel sizes per conv block
+        fc_sizes (list[int]): list of fully-connected hidden sizes (final layer to num_classes)
+        activation (str): 'relu'|'leakyrelu'|'elu'|'tanh'
+        dropout (float): dropout probability used after FC layers
+        num_classes (int): final number of classes
+
+    Returns:
+        nn.Module: a LeNet-like network instance
+    """
+    if conv_channels is None:
+        conv_channels = [16, 32, 64][:num_conv_layers]
+    if kernel_sizes is None:
+        kernel_sizes = [3] * num_conv_layers
+    if fc_sizes is None:
+        fc_sizes = [256]
+
+    act_map = {
+        'relu': nn.ReLU,
+        'leakyrelu': lambda: nn.LeakyReLU(0.1),
+        'elu': nn.ELU,
+        'tanh': nn.Tanh,
+    }
+    Act = act_map.get(activation, nn.ReLU)
+
+    class LeNetVariant(nn.Module):
+        def __init__(self):
+            super().__init__()
+            layers = []
+            in_ch = 3
+            for i in range(num_conv_layers):
+                out_ch = conv_channels[i]
+                k = kernel_sizes[i]
+                layers.append(nn.Conv2d(in_ch, out_ch, kernel_size=k, padding=k//2))
+                # instantiate activation (callable) if needed
+                if callable(Act):
+                    layers.append(Act() if Act is not nn.ReLU else nn.ReLU())
+                else:
+                    layers.append(Act)
+                layers.append(nn.MaxPool2d(2))
+                in_ch = out_ch
+
+            self.feature_extractor = nn.Sequential(*layers)
+
+            # Infer flattened feature size with a dummy forward pass
+            with torch.no_grad():
+                dummy = torch.zeros(1, 3, 48, 48)
+                feat = self.feature_extractor(dummy)
+                flat_size = feat.view(1, -1).shape[1]
+
+            fc_layers = []
+            prev = flat_size
+            for sz in fc_sizes:
+                fc_layers.append(nn.Linear(prev, sz))
+                # activation and dropout
+                if callable(Act):
+                    fc_layers.append(Act() if Act is not nn.ReLU else nn.ReLU())
+                else:
+                    fc_layers.append(Act)
+                fc_layers.append(nn.Dropout(dropout))
+                prev = sz
+            fc_layers.append(nn.Linear(prev, num_classes))
+
+            self.classifier = nn.Sequential(*fc_layers)
+
+            # metadata
+            self.model_name = 'lenet_variant'
+            self.num_classes = num_classes
+            self.dropout_rate = dropout
+
+        def forward(self, x):
+            x = self.feature_extractor(x)
+            x = x.view(x.size(0), -1)
+            x = self.classifier(x)
+            return x
+
+        def get_num_parameters(self):
+            return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
+    return LeNetVariant()
+
+
 # ShallowCNN removed - keeping the codebase focused on the selected models.
 
 
