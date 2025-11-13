@@ -287,6 +287,57 @@ if __name__ == '__main__':
 			'activation': 'leakyrelu',
 			'dropout': 0.5,
 		}
+		,
+		{
+			'name': 'elu',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [3, 3, 3],
+			'activation': 'elu',
+			'dropout': 0.5,
+		},
+		{
+			'name': 'tanh',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [3, 3, 3],
+			'activation': 'tanh',
+			'dropout': 0.5,
+		},		{
+			'name': 'kernel_5x5_all',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [5, 5, 5],
+			'activation': 'relu',
+			'dropout': 0.5,
+		},
+		{
+			'name': 'kernel_7x7_first',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [7, 3, 3],
+			'activation': 'relu',
+			'dropout': 0.5,
+		},		
+		{
+			'name': 'act_selu',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [3, 3, 3],
+			'activation': 'selu',
+			'dropout': 0.5,
+		},
+		### Kernel sizes 
+		{
+			'name': 'kernel_mixed_531',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [5, 3, 1],
+			'activation': 'relu',
+			'dropout': 0.5,
+		},
+
+
 	]
 
 	run_ablation(configs, epochs=args.epochs, batch_size=args.batch_size, lr=args.lr, export_top=args.export_top, aug=args.aug)

@@ -29,7 +29,7 @@ from dataset import GTSRBDataset
 from augmentation import get_augmentation_transforms
 
 
-def train_epoch(model, loader, criterion, optimizer, device):
+def train_epoch(model, loader, criterion, optimizer, device, scheduler=None):
 	model.train()
 	running_loss = 0.0
 	correct = 0
@@ -43,6 +43,12 @@ def train_epoch(model, loader, criterion, optimizer, device):
 		loss = criterion(outputs, labels)
 		loss.backward()
 		optimizer.step()
+		# step scheduler per batch if provided (e.g., OneCycleLR)
+		if scheduler is not None:
+			try:
+				scheduler.step()
+			except Exception:
+				pass
 
 		running_loss += loss.item() * images.size(0)
 		_, predicted = outputs.max(1)
@@ -110,6 +116,9 @@ def main():
 	parser.add_argument('--patience', type=int, default=None, help='Early stopping patience (epochs)')
 	parser.add_argument('--min_delta', type=float, default=None, help='Minimum change to qualify as improvement')
 	parser.add_argument('--eval-only', action='store_true', help='Only evaluate the provided checkpoint')
+	parser.add_argument('--optimizer', type=str, default='adam', choices=['adam','adamw','sgd'], help='Optimizer to use for fine-tuning')
+	parser.add_argument('--scheduler', type=str, default='none', choices=['none','onecycle'], help='LR scheduler to use (onecycle recommended for sgd)')
+	parser.add_argument('--max_lr', type=float, default=None, help='Max LR for OneCycleLR (optional)')
 	parser.add_argument('--aug', type=str, default='basic', choices=['none', 'basic', 'advanced'], help='Augmentation strategy for fine-tuning')
 	args = parser.parse_args()
 
@@ -157,7 +166,7 @@ def main():
 	train_transform, val_transform, _ = get_augmentation_transforms(args.aug, input_size=48)
 	dataset_full = GTSRBDataset(root_dir='Final_Training', transform=train_transform, is_train=True)
 	# 90/10 split
-	train_size = int(0.9 * len(dataset_full))
+	train_size = int(0.8 * len(dataset_full))
 	val_size = len(dataset_full) - train_size
 	train_dataset, val_dataset = torch.utils.data.random_split(dataset_full, [train_size, val_size])
 	# ensure validation uses val_transform
@@ -178,14 +187,35 @@ def main():
 			print(f"Warning: could not load checkpoint weights: {e}")
 
 	# Evaluate-only mode
-	criterion = nn.CrossEntropyLoss()
+	criterion = nn.CrossEntropyLoss(label_smoothing=0.1)  #TODO
 	if args.eval_only:
 		val_loss, val_acc = validate_epoch(model, val_loader, criterion, device)
 		print(f"Validation - Loss: {val_loss:.4f}, Acc: {val_acc:.2f}%")
 		return
 
-	# Optimizer: fine-tune all params by default
-	optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+	# Optimizer selection
+	if args.optimizer == 'adam':
+		optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+	elif args.optimizer == 'adamw':
+		optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+	elif args.optimizer == 'sgd':
+		optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=args.weight_decay)
+	else:
+		optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+
+	# Scheduler (e.g., OneCycleLR) - stepped per batch inside train_epoch
+	scheduler = None
+	if args.scheduler == 'onecycle':
+		try:
+			# prefer user-provided max_lr, otherwise use args.lr
+			max_lr = args.max_lr if args.max_lr is not None else args.lr
+			from torch.optim.lr_scheduler import OneCycleLR
+			# steps_per_epoch must be > 0
+			steps_per_epoch = max(1, len(train_loader))
+			scheduler = OneCycleLR(optimizer, max_lr=max_lr, steps_per_epoch=steps_per_epoch, epochs=args.epochs)
+		except Exception as e:
+			print(f"Warning: could not create OneCycleLR scheduler: {e}")
+			scheduler = None
 
 	best_val = -1.0
 	epochs_no_improve = 0
@@ -193,7 +223,7 @@ def main():
 
 	for epoch in range(1, args.epochs + 1):
 		print(f"\nEpoch [{epoch}/{args.epochs}]")
-		train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device)
+		train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device, scheduler=scheduler)
 		val_loss, val_acc = validate_epoch(model, val_loader, criterion, device)
 
 		print(f"Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%")
@@ -204,49 +234,22 @@ def main():
 		if improved:
 			best_val = val_acc
 			epochs_no_improve = 0
-			# save best
+			
+			# Build descriptive filename
+			lr_s = f"{args.lr:g}"
+			bs_s = str(args.batch_size)
+			drop_s = f"{args.dropout:g}"
+			wd_s = f"{args.weight_decay:g}"
+			preset_s = args.preset
+			
+			param_parts = [f"lr{lr_s}", f"bs{bs_s}", f"drop{drop_s}", f"wd{wd_s}", f"preset{preset_s}"]
+			param_summary = '_'.join(param_parts)
+			
+			# Save to tuned_models (for tracking)
 			os.makedirs('tuned_models', exist_ok=True)
-			timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-			# Build a run-folder name from hyperparameters so each run is stored in its own subfolder
-			def _fmt_val(v):
-				if v is None:
-					return None
-				if isinstance(v, float):
-					return f"{v:g}"
-				return str(v)
-
-			# Build run folder starting with model name, then preset, then remaining params
-			lr_s = _fmt_val(args.lr)
-			bs_s = _fmt_val(args.batch_size)
-			drop_s = _fmt_val(args.dropout)
-			wd_s = _fmt_val(args.weight_decay)
-			preset_s = _fmt_val(args.preset)
-
-			# Model label (human-friendly)
-			model_label = 'LeNet'
-
-			param_parts = []
-			if lr_s:
-				param_parts.append(f"lr{lr_s}")
-			if bs_s:
-				param_parts.append(f"bs{bs_s}")
-			if drop_s:
-				param_parts.append(f"drop{drop_s}")
-			if wd_s:
-				param_parts.append(f"wd{wd_s}")
-
-			preset_label = f"preset_{preset_s}" if preset_s else "preset_manual"
-			run_folder = f"{model_label}_{preset_label}"
-			if param_parts:
-				run_folder = run_folder + '_' + '_'.join(param_parts)
-			# Create the run directory under tuned_models
-			run_dir = os.path.join('tuned_models', run_folder)
-			os.makedirs(run_dir, exist_ok=True)
-
-			# Save checkpoint inside the run directory
-			save_path = os.path.join(run_dir, f'tuned_lenet_{timestamp}.pth')
-			# Persist common hyperparameters in the checkpoint so we can synthesize descriptive filenames later
-			torch.save({
+			tuned_path = os.path.join('tuned_models', f'tuned_lenet_{param_summary}.pth')
+			
+			checkpoint_data = {
 				'epoch': epoch,
 				'model_state_dict': model.state_dict(),
 				'optimizer_state_dict': optimizer.state_dict(),
@@ -259,16 +262,29 @@ def main():
 				'weight_decay': args.weight_decay,
 				'batch_size': args.batch_size,
 				'preset': args.preset,
-			}, save_path)
-			best_checkpoint = save_path
-			print(f"New best model saved to: {save_path}")
-		else:
-			epochs_no_improve += 1
-			print(f"No improvement for {epochs_no_improve} epoch(s)")
+			}
+			
+			torch.save(checkpoint_data, tuned_path)
+			print(f"Checkpoint saved to: {tuned_path}")
+			
+			# IMMEDIATELY copy to trained_models with descriptive name
+			os.makedirs('trained_models', exist_ok=True)
+			trained_path = os.path.join('trained_models', f'best_lenet_tuned_{param_summary}.pth')
+			
+			try:
+				torch.save(checkpoint_data, trained_path)
+				best_checkpoint = trained_path
+				print(f"✓ Best model copied to: {trained_path} (Val Acc: {best_val:.2f}%)")
+			except Exception as e:
+				print(f"✗ Failed to copy to trained_models: {e}")
+				best_checkpoint = tuned_path
+			else:
+					epochs_no_improve += 1
+					print(f"No improvement for {epochs_no_improve} epoch(s)")
 
-		if epochs_no_improve >= args.patience:
-			print(f"Early stopping triggered (patience={args.patience})")
-			break
+					if epochs_no_improve >= args.patience:
+						print(f"Early stopping triggered (patience={args.patience})")
+						break
 
 	print("\nFine-tuning completed.")
 	if best_checkpoint:

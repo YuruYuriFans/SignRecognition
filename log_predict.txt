@@ -2,13 +2,17 @@ Using device: cuda
 GPU: NVIDIA GeForce RTX 4060 Laptop GPU
 
 ============================================================
-Found 6 model(s) for prediction.
-  1. best_lenet_basic.pth
-  2. best_minivgg_basic.pth
-  3. best_tuned_lenet_20251113_112711.pth
-  4. best_mobilenetv2_025_basic.pth
-  5. best_tuned_lenet_20251113_111946.pth
-  6. best_mobilenetv4_small_basic.pth
+Found 10 model(s) for prediction.
+  1. best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910.pth
+  2. best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced.pth
+  3. best_lenet_basic.pth
+  4. best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915.pth
+  5. best_minivgg_basic.pth
+  6. best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918.pth
+  7. best_lenet_tuned_lr0.0005_bs128_drop0.5_wd0.0001_presetbalanced.pth
+  8. best_mobilenetv2_025_basic.pth
+  9. best_lenet_tuned.pth
+  10. best_mobilenetv4_small_basic.pth
 ============================================================
 
 ============================================================
@@ -16,6 +20,32 @@ Preparing test dataset...
 ============================================================
 Loaded 12630 test images with ground truth
 Test dataset loaded. Ground Truth available: True
+
+Loading model from: best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910.pth
+State dict load (strict) failed: Error(s) in loading state_dict for LeNet:
+	Missing key(s) in state_dict: "conv1.weight", "conv1.bias", "conv2.weight", "conv2.bias", "conv3.weight", "conv3.bias", "fc1.weight", "fc1.bias", "fc2.weight", "fc2.bias". 
+	Unexpected key(s) in state_dict: "total_ops", "total_params", "feature_extractor.0.weight", "feature_extractor.0.bias", "feature_extractor.3.weight", "feature_extractor.3.bias", "classifier.0.weight", "classifier.0.bias", "classifier.3.weight", "classifier.3.bias". 
+Retrying with strict=False...
+
+--- Starting Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910 ---
+
+Predictions saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910 ---
+
+
+Loading model from: best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced.pth
+
+--- Starting Prediction for best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced ---
+
+Predictions saved to: predictions/best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced ---
+
 
 Loading model from: best_lenet_basic.pth
 
@@ -26,6 +56,21 @@ Generating confusion matrix...
 Confusion matrix saved to: predictions/best_lenet_basic/confusion_matrix.png
 Evaluation metrics saved to: predictions/best_lenet_basic/evaluation_metrics.txt
 --- Completed Prediction for best_lenet_basic ---
+
+
+Loading model from: best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915.pth
+State dict load (strict) failed: Error(s) in loading state_dict for LeNet:
+	Missing key(s) in state_dict: "conv1.weight", "conv1.bias", "conv2.weight", "conv2.bias", "conv3.weight", "conv3.bias", "fc1.weight", "fc1.bias", "fc2.weight", "fc2.bias". 
+	Unexpected key(s) in state_dict: "total_ops", "total_params", "feature_extractor.0.weight", "feature_extractor.0.bias", "feature_extractor.3.weight", "feature_extractor.3.bias", "feature_extractor.6.weight", "feature_extractor.6.bias", "classifier.0.weight", "classifier.0.bias", "classifier.3.weight", "classifier.3.bias". 
+Retrying with strict=False...
+
+--- Starting Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915 ---
+
+Predictions saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915 ---
 
 
 Loading model from: best_minivgg_basic.pth
@@ -39,15 +84,30 @@ Evaluation metrics saved to: predictions/best_minivgg_basic/evaluation_metrics.t
 --- Completed Prediction for best_minivgg_basic ---
 
 
-Loading model from: best_tuned_lenet_20251113_112711.pth
+Loading model from: best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918.pth
+State dict load (strict) failed: Error(s) in loading state_dict for LeNet:
+	Missing key(s) in state_dict: "conv1.weight", "conv1.bias", "conv2.weight", "conv2.bias", "conv3.weight", "conv3.bias", "fc1.weight", "fc1.bias", "fc2.weight", "fc2.bias". 
+	Unexpected key(s) in state_dict: "total_ops", "total_params", "feature_extractor.0.weight", "feature_extractor.0.bias", "feature_extractor.3.weight", "feature_extractor.3.bias", "feature_extractor.6.weight", "feature_extractor.6.bias", "classifier.0.weight", "classifier.0.bias", "classifier.3.weight", "classifier.3.bias". 
+Retrying with strict=False...
 
---- Starting Prediction for best_tuned_lenet_20251113_112711 ---
+--- Starting Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918 ---
 
-Predictions saved to: predictions/best_tuned_lenet_20251113_112711/predictions.csv
+Predictions saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918/predictions.csv
 Generating confusion matrix...
-Confusion matrix saved to: predictions/best_tuned_lenet_20251113_112711/confusion_matrix.png
-Evaluation metrics saved to: predictions/best_tuned_lenet_20251113_112711/evaluation_metrics.txt
---- Completed Prediction for best_tuned_lenet_20251113_112711 ---
+Confusion matrix saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918 ---
+
+
+Loading model from: best_lenet_tuned_lr0.0005_bs128_drop0.5_wd0.0001_presetbalanced.pth
+
+--- Starting Prediction for best_lenet_tuned_lr0.0005_bs128_drop0.5_wd0.0001_presetbalanced ---
+
+Predictions saved to: predictions/best_lenet_tuned_lr0.0005_bs128_drop0.5_wd0.0001_presetbalanced/predictions.csv
+Generating confusion matrix...
+Confusion matrix saved to: predictions/best_lenet_tuned_lr0.0005_bs128_drop0.5_wd0.0001_presetbalanced/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_tuned_lr0.0005_bs128_drop0.5_wd0.0001_presetbalanced/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_tuned_lr0.0005_bs128_drop0.5_wd0.0001_presetbalanced ---
 
 
 Loading model from: best_mobilenetv2_025_basic.pth
@@ -61,15 +121,15 @@ Evaluation metrics saved to: predictions/best_mobilenetv2_025_basic/evaluation_m
 --- Completed Prediction for best_mobilenetv2_025_basic ---
 
 
-Loading model from: best_tuned_lenet_20251113_111946.pth
+Loading model from: best_lenet_tuned.pth
 
---- Starting Prediction for best_tuned_lenet_20251113_111946 ---
+--- Starting Prediction for best_lenet_tuned ---
 
-Predictions saved to: predictions/best_tuned_lenet_20251113_111946/predictions.csv
+Predictions saved to: predictions/best_lenet_tuned/predictions.csv
 Generating confusion matrix...
-Confusion matrix saved to: predictions/best_tuned_lenet_20251113_111946/confusion_matrix.png
-Evaluation metrics saved to: predictions/best_tuned_lenet_20251113_111946/evaluation_metrics.txt
---- Completed Prediction for best_tuned_lenet_20251113_111946 ---
+Confusion matrix saved to: predictions/best_lenet_tuned/confusion_matrix.png
+Evaluation metrics saved to: predictions/best_lenet_tuned/evaluation_metrics.txt
+--- Completed Prediction for best_lenet_tuned ---
 
 
 Loading model from: best_mobilenetv4_small_basic.pth
@@ -90,25 +150,33 @@ MODEL PREDICTION COMPARISON SUMMARY
 Model File                     Augmentation    Val Acc (Train)    Test Acc     Test F1  Test Prec  Test Rec  W-F1     W-Prec     W-Rec     LogLoss   
 --------------------------------------------------------------------------------------------------------------------------------------------
 best_minivgg_basic             basic           99.80%             0.9819       0.9737   0.9778     0.9715    0.9818   0.9824     0.9819    0.101425  
+best_lenet_tuned               advanced        99.91%             0.9705       0.9544   0.9636     0.9498    0.9697   0.9708     0.9705    0.255696  
 best_lenet_basic               basic           99.72%             0.9635       0.9412   0.9472     0.9432    0.9629   0.9651     0.9635    0.171329  
+best_lenet_tuned_lr0.0005_bs128_drop0.5_wd0.0001_presetbalanced advanced        100.00%            0.9625       0.9400   0.9459     0.9402    0.9619   0.9637     0.9625    0.173440  
 best_mobilenetv4_small_basic   basic           99.26%             0.9513       0.9253   0.9293     0.9258    0.9508   0.9523     0.9513    0.210475  
+best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced advanced        99.31%             0.9315       0.9005   0.9153     0.8978    0.9308   0.9352     0.9315    0.334313  
 best_mobilenetv2_025_basic     basic           98.32%             0.9083       0.8630   0.8704     0.8654    0.9079   0.9113     0.9083    0.353716  
-best_tuned_lenet_20251113_112711 basic           98.27%             0.8789       0.8433   0.8731     0.8340    0.8774   0.8846     0.8789    0.519486  
-best_tuned_lenet_20251113_111946 basic           98.27%             0.8789       0.8433   0.8731     0.8340    0.8774   0.8846     0.8789    0.519486  
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915 N/A             30.20%             0.0357       0.0020   0.0012     0.0153    0.0046   0.0026     0.0357    3.759008  
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910 N/A             43.46%             0.0119       0.0005   0.0003     0.0233    0.0003   0.0001     0.0119    3.766957  
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918 N/A             41.21%             0.0099       0.0011   0.0006     0.0267    0.0005   0.0003     0.0099    3.769356  
 
 ==========================================================================================
-Detailed prediction results saved to: predictions/prediction_summary_364028.json
+Detailed prediction results saved to: predictions/prediction_summary_388639.json
 
 Best Model by Test Accuracy: best_minivgg_basic (0.9819)
 ==========================================================================================
-Prediction Summary - 2025-11-13 11:28:20
+Prediction Summary - 2025-11-13 16:16:54
 Model                           Latency(ms) Throughput(img/s)   FLOPs(G)  ModelSize(MB)   PeakGPU_MB   PeakCPU_MB    TestAcc   TestF1 TestPrec  TestRec     W-F1     W-Prec W-Rec               
 ------------------------------------------------------------------------------------------------------------------------------------------------------
-best_lenet_basic                      0.535        119725.55      0.007           2.38         30.2       1181.8     0.9635   0.9412   0.9472   0.9432   0.9629     0.9651 0.9635              
-best_minivgg_basic                    2.071         30900.33      0.060          18.34         64.3       1323.1     0.9819   0.9737   0.9778   0.9715   0.9818     0.9824 0.9819              
-best_tuned_lenet_20251113_112711        0.533        120050.02      0.007           2.38         30.8       1350.1     0.8789   0.8433   0.8731   0.8340   0.8774     0.8846 0.8789              
-best_mobilenetv2_025_basic            1.287         49731.18      0.002           0.21         25.9       1383.8     0.9083   0.8630   0.8704   0.8654   0.9079     0.9113 0.9083              
-best_tuned_lenet_20251113_111946        0.560        114234.66      0.007           2.38         30.8       1424.8     0.8789   0.8433   0.8731   0.8340   0.8774     0.8846 0.8789              
-best_mobilenetv4_small_basic          3.471         18437.98      0.011           6.33         25.3       1414.0     0.9513   0.9253   0.9293   0.9258   0.9508     0.9523 0.9513              
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114910        0.532        120403.80      0.007           2.38         30.2       1187.4     0.0119   0.0005   0.0003   0.0233   0.0003     0.0001 0.0119              
+best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced        0.536        119511.80      0.007           2.38         30.2       1316.5     0.9315   0.9005   0.9153   0.8978   0.9308     0.9352 0.9315              
+best_lenet_basic                      0.559        114576.95      0.007           2.38         30.2       1358.8     0.9635   0.9412   0.9472   0.9432   0.9629     0.9651 0.9635              
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114915        0.536        119467.65      0.007           2.38         30.2       1386.5     0.0357   0.0020   0.0012   0.0153   0.0046     0.0026 0.0357              
+best_minivgg_basic                    2.174         29445.43      0.060          18.34         64.3       1406.7     0.9819   0.9737   0.9778   0.9715   0.9818     0.9824 0.9819              
+best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_114918        0.538        118989.46      0.007           2.38         30.2       1394.9     0.0099   0.0011   0.0006   0.0267   0.0005     0.0003 0.0099              
+best_lenet_tuned_lr0.0005_bs128_drop0.5_wd0.0001_presetbalanced        0.535        119603.92      0.007           2.38         30.2       1394.9     0.9625   0.9400   0.9459   0.9402   0.9619     0.9637 0.9625              
+best_mobilenetv2_025_basic            1.616         39594.18      0.002           0.21         25.9       1402.0     0.9083   0.8630   0.8704   0.8654   0.9079     0.9113 0.9083              
+best_lenet_tuned                      0.558        114747.39      0.007           2.38         30.2       1437.7     0.9705   0.9544   0.9636   0.9498   0.9697     0.9708 0.9705              
+best_mobilenetv4_small_basic          3.235         19781.35      0.011           6.33         25.3       1438.8     0.9513   0.9253   0.9293   0.9258   0.9508     0.9523 0.9513              
 
 ✓ BATCH PREDICTION AND EVALUATION COMPLETED! All outputs are in the 'predictions/' directory.

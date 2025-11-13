@@ -1,6 +1,21 @@
-Tune Results Summary - 2025-11-13 12:39:35
+Tune Results Summary - 2025-11-13 17:44:42
 File                                                           Accuracy   Selected
 ------------------------------------------------------------------------------------------
+tuned_lenet_lr0.0003_bs128_drop0.6_wd0.0003_presetbalanced.pth    98.0745           
+tuned_lenet_20251113_160457.pth                                 99.7450           
+tuned_lenet_20251113_160552.pth                                 99.8725           
+tuned_lenet_20251113_160639.pth                                 99.9235           
+tuned_lenet_20251113_160556.pth                                 99.8852           
+tuned_lenet_20251113_160453.pth                                 99.6047           
+tuned_lenet_20251113_160504.pth                                 99.7960           
+tuned_lenet_20251113_160500.pth                                 99.7832           
+tuned_lenet_20251113_160507.pth                                 99.8087           
+tuned_lenet_20251113_160539.pth                                 99.8597           
+tuned_lenet_20251113_160653.pth                                 99.9362           
+tuned_lenet_20251113_160606.pth                                 99.9107           
+tuned_lenet_20251113_160510.pth                                 99.8470           
+tuned_lenet_20251113_155950.pth                                 99.8980           
+tuned_lenet_20251113_160021.pth                                 99.9235           
 tuned_lenet_20251113_113442.pth                                 97.2456           
 tuned_lenet_20251113_113434.pth                                 96.6590           
 tuned_lenet_20251113_113455.pth                                 97.7302           
@@ -21,20 +36,44 @@ tuned_lenet_20251113_113450.pth                                 97.6537
 tuned_lenet_20251113_113430.pth                                 96.2255           
 tuned_lenet_20251113_113422.pth                                 95.3583           
 tuned_lenet_20251113_113348.pth                                 38.0770           
+tuned_lenet_20251113_125131.pth                                 48.5080           
+tuned_lenet_20251113_125128.pth                                 35.1186           
+tuned_lenet_20251113_125011.pth                                 12.6498           
+tuned_lenet_20251113_125015.pth                                 31.8541           
+tuned_lenet_20251113_124910.pth                                 20.0714           
+tuned_lenet_20251113_124914.pth                                 36.1897           
 tuned_lenet_20251113_120313.pth                                 66.3096           
+tuned_lenet_20251113_154124.pth                                 98.4443           
 tuned_lenet_20251113_120451.pth                                 98.9288           
+tuned_lenet_20251113_154127.pth                                 98.7248           
 tuned_lenet_20251113_120325.pth                                 87.2992           
+tuned_lenet_20251113_124816.pth                                 46.1872           
 tuned_lenet_20251113_120421.pth                                 98.2913           
-tuned_lenet_20251113_120525.pth                                 99.2349        YES
+tuned_lenet_20251113_154206.pth                                 99.3114           
+tuned_lenet_20251113_154059.pth                                 92.3744           
+tuned_lenet_20251113_120525.pth                                 99.2349           
+tuned_lenet_20251113_154113.pth                                 98.0362           
 tuned_lenet_20251113_120319.pth                                 80.6427           
 tuned_lenet_20251113_120439.pth                                 98.5973           
+tuned_lenet_20251113_154109.pth                                 97.2711           
+tuned_lenet_20251113_154055.pth                                 84.4938           
+tuned_lenet_20251113_154102.pth                                 94.7972           
 tuned_lenet_20251113_120402.pth                                 97.3731           
+tuned_lenet_20251113_154120.pth                                 98.2402           
 tuned_lenet_20251113_120433.pth                                 98.5463           
+tuned_lenet_20251113_154135.pth                                 98.9543           
 tuned_lenet_20251113_120344.pth                                 95.0013           
+tuned_lenet_20251113_124945.pth                                 46.7228           
+tuned_lenet_20251113_124820.pth                                 63.0196           
 tuned_lenet_20251113_120338.pth                                 93.2160           
+tuned_lenet_20251113_154106.pth                                 96.9906           
 tuned_lenet_20251113_120408.pth                                 97.4496           
 tuned_lenet_20251113_120331.pth                                 92.2979           
+tuned_lenet_20251113_154051.pth                                 62.1270           
+tuned_lenet_20251113_154145.pth                                 99.0309           
+tuned_lenet_20251113_124949.pth                                 71.6144           
 tuned_lenet_20251113_120427.pth                                 98.3168           
+tuned_lenet_20251113_154152.pth                                 99.1329           
 tuned_lenet_20251113_120350.pth                                 96.1744           
 tuned_lenet_20251113_120356.pth                                 96.8120           
 tuned_lenet_20251113_120306.pth                                 45.7026           
@@ -57,6 +96,14 @@ tuned_lenet_20251113_121246.pth                                 80.2091
 tuned_lenet_20251113_121354.pth                                 98.0872           
 tuned_lenet_20251113_121348.pth                                 97.9852           
 tuned_lenet_20251113_121257.pth                                 88.5488           
+tuned_lenet_20251113_125052.pth                                 89.1864           
+tuned_lenet_20251113_125048.pth                                 69.7526           
+tuned_lenet_20251113_124844.pth                                 21.2956           
+tuned_lenet_20251113_124848.pth                                 42.7187           
+tuned_lenet_20251113_155557.pth                                100.0000        YES
+tuned_lenet_20251113_155550.pth                                 99.9745           
+tuned_lenet_20251113_125201.pth                                 80.4642           
+tuned_lenet_20251113_125157.pth                                 55.7001           
 tuned_lenet_20251113_123052.pth                                 96.8630           
 tuned_lenet_20251113_123904.pth                                 95.9194           
 tuned_lenet_20251113_123046.pth                                 96.8375           
@@ -93,4 +140,4 @@ tuned_lenet_20251113_123130.pth                                 98.3168
 tuned_lenet_20251113_123848.pth                                 90.0791           
 
 
-Copied best tuned model to: trained_models/best_lenet_tuned_lr0.0002_bs64_drop0.4_wd1e-05_presetbalanced.pth
+Copied best tuned model to: trained_models/best_lenet_tuned_lr0.0005_bs128_drop0.5_wd0.0001_presetbalanced.pth

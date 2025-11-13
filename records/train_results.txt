@@ -1,6 +1,7 @@
-Training Summary - 2025-11-13 10:00:28
-Model	Augmentation	Parameters	Time(mins)	BestVal(%)	FinalTrain(%)	FinalVal(%)	FLOPs(G)	Throughput(img/s)	PeakGPU_MB	PeakCPU_MB
-mobilenetv2_025	basic	53,979	2.59	98.32	99.38	98.32	0.002	45953.64	35.7	1375.8
-lenet	basic	624,715	2.02	99.72	99.75	99.64	0.007	118202.47	46.6	1418.3
-minivgg	basic	4,806,731	3.04	99.80	99.89	99.80	0.060	32454.74	128.2	1440.1
-mobilenetv4_small	basic	1,658,507	4.66	99.26	100.00	99.23	0.011	18743.95	53.8	1448.6
+Training Summary - 2025-11-13 17:44:27
+Model                Augmentation     Parameters Time(mins)  BestVal(%) FinalTrain(%) FinalVal(%)   FLOPs(G) Throughput(img/s)   PeakGPU_MB   PeakCPU_MB
+------------------------------------------------------------------------------------------------------------------------------------------
+mobilenetv2_025      basic                53,979       0.20       76.05         64.73       76.05      0.002        86624.64         53.2       1393.4
+lenet                basic               624,715       0.18       96.07         85.95       96.07      0.007       111899.63         66.0       1424.3
+minivgg              basic             4,806,731       0.34       99.29         96.02       99.29      0.060        14337.87        165.8       1446.5
+mobilenetv4_small    basic             1,658,507       0.35       94.62         95.16       94.62      0.011        24310.46         45.1       1524.4

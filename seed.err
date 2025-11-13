@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/home/boyan/Desktop/COMP3419/SignRecognition/run_multiple_seeds.py", line 284, in evaluate_models
+    shutil.copy2(basic_model_path, os.path.join('trained_models', f'model_basic_seed{seed}.pth'))
+  File "/home/boyan/anaconda3/lib/python3.11/shutil.py", line 436, in copy2
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+  File "/home/boyan/anaconda3/lib/python3.11/shutil.py", line 256, in copyfile
+    with open(src, 'rb') as fsrc:
+         ^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'trained_models/best_lenet_basic_seed42.pth'
+Traceback (most recent call last):
+  File "/home/boyan/Desktop/COMP3419/SignRecognition/run_multiple_seeds.py", line 284, in evaluate_models
+    shutil.copy2(basic_model_path, os.path.join('trained_models', f'model_basic_seed{seed}.pth'))
+  File "/home/boyan/anaconda3/lib/python3.11/shutil.py", line 436, in copy2
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+  File "/home/boyan/anaconda3/lib/python3.11/shutil.py", line 256, in copyfile
+    with open(src, 'rb') as fsrc:
+         ^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'trained_models/best_lenet_basic_seed43.pth'
