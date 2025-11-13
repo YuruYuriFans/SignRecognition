@@ -1,0 +1,10 @@
+Model: best_lenet_ablation_lenet_preset_manual_lr0.0001_bs64_drop0.5_20251113_191233
+Augmentation: N/A
+Accuracy: 0.0409
+Macro F1: 0.0063
+Macro Precision: 0.0035
+Macro Recall: 0.0385
+Weighted F1: 0.0050
+Weighted Precision: 0.0027
+Weighted Recall: 0.0409
+Log Loss: 3.764754

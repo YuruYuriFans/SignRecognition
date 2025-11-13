@@ -78,7 +78,6 @@ def get_test_transform(input_size=48):
     _, val_transform, _ = get_augmentation_transforms('none', input_size)
     return val_transform
 
-
 def load_model(model_path, device):
     """
     Load trained model from checkpoint using the imported LeNet class.
@@ -98,14 +97,22 @@ def load_model(model_path, device):
     # Load checkpoint first so we can infer which architecture to instantiate
     checkpoint = torch.load(model_path, map_location=device)
 
-    # Determine model type: prefer explicit 'model' key saved by train.py, else infer from filename
+    # Determine model type
     model_type = checkpoint.get('model') if isinstance(checkpoint, dict) else None
+    bn = os.path.basename(model_path).lower()
+
     if not model_type:
-        bn = os.path.basename(model_path).lower()
         for candidate in ['lenet', 'shallow_cnn', 'minivgg', 'mobilenetv1_025', 'shufflenetv2_025']:
             if candidate in bn:
                 model_type = candidate
                 break
+
+    # Detect ablation or variant models
+    if isinstance(checkpoint, dict) and checkpoint.get('model') == 'lenet_variant':
+        model_type = 'lenet_variant'
+    elif "ablation" in bn:
+        model_type = 'lenet_variant'  # fallback for older ablations
+
 
     if not model_type:
         # fallback to LeNet for backward compatibility
@@ -117,9 +124,20 @@ def load_model(model_path, device):
 
     # Instantiate model via factory
     try:
-        model = create_model(model_type, num_classes=num_classes, dropout_rate=dropout_rate).to(device)
+        # For ablation/variant models, use saved config if available to reconstruct exact architecture
+        model_kwargs = {'num_classes': num_classes, 'dropout_rate': dropout_rate}
+        if model_type == 'lenet_variant' and isinstance(checkpoint, dict) and 'config' in checkpoint:
+            cfg = checkpoint['config']
+            model_kwargs.update({
+                'num_conv_layers': cfg.get('num_conv_layers', 3),
+                'conv_channels': cfg.get('conv_channels'),
+                'kernel_sizes': cfg.get('kernel_sizes'),
+                'fc_sizes': cfg.get('fc_sizes'),
+                'activation': cfg.get('activation', 'relu'),
+                'dropout': cfg.get('dropout', 0.5),
+            })
+        model = create_model(model_type, **model_kwargs).to(device)
     except Exception as e:
-        # As a last resort, fall back to LeNet
         print(f"Warning: could not create model '{model_type}' ({e}), falling back to LeNet")
         model = LeNet(num_classes=num_classes).to(device)
 
@@ -136,25 +154,21 @@ def load_model(model_path, device):
             try:
                 model.load_state_dict(checkpoint['model_state_dict'])
             except RuntimeError as e:
-                # Try non-strict load (useful if layer names differ slightly)
                 print(f"State dict load (strict) failed: {e}\nRetrying with strict=False...")
                 model.load_state_dict(checkpoint['model_state_dict'], strict=False)
         elif isinstance(checkpoint, dict):
-            # maybe the dict itself is the state_dict
             try:
                 model.load_state_dict(checkpoint)
             except RuntimeError as e:
                 print(f"State dict load failed: {e}\nAttempting non-strict load...")
                 model.load_state_dict(checkpoint, strict=False)
         else:
-            # checkpoint is not a dict: assume it's a state_dict-like object
             model.load_state_dict(checkpoint)
     except Exception as e:
         raise RuntimeError(f"Failed to load model state for '{model_type}' from {model_path}: {e}")
 
     model.eval()
     return model, checkpoint_info
-
 
 def predict(model, test_loader, device, has_gt=False):
     """

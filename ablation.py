@@ -198,10 +198,15 @@ def run_ablation(configs, epochs=1, batch_size=64, lr=1e-4, export_top=1, aug='b
 			print(f" Train Acc: {t_acc:.2f}%, Val Acc: {v_acc:.2f}%")
 
 			# Save checkpoint in run dir
+			# Clean state dict to remove profiling buffers (total_ops, total_params) from thop
+			state_dict = model.state_dict()
+			cleaned_state_dict = {k: v for k, v in state_dict.items() 
+			                      if k not in ('total_ops', 'total_params')}
+			
 			ck_path = os.path.join(run_dir, f'ablation_ck_epoch{epoch}.pth')
 			torch.save({
 				'epoch': epoch,
-				'model_state_dict': model.state_dict(),
+				'model_state_dict': cleaned_state_dict,
 				'optimizer_state_dict': optimizer.state_dict(),
 				'accuracy': v_acc,
 				'config': cfg,
@@ -219,7 +224,12 @@ def run_ablation(configs, epochs=1, batch_size=64, lr=1e-4, export_top=1, aug='b
 			try:
 				best_name = f"best_lenet_ablation_{run_folder}_{timestamp}.pth"
 				dest = os.path.join('trained_models', best_name)
-				torch.save(torch.load(best_ck, map_location='cpu'), dest)
+				# Load checkpoint and clean state dict before re-saving
+				ck = torch.load(best_ck, map_location='cpu')
+				if isinstance(ck, dict) and 'model_state_dict' in ck:
+					ck['model_state_dict'] = {k: v for k, v in ck['model_state_dict'].items() 
+					                          if k not in ('total_ops', 'total_params')}
+				torch.save(ck, dest)
 				copied = dest
 				print(f"Copied best to trained_models: {dest}")
 			except Exception as e:
@@ -287,57 +297,6 @@ if __name__ == '__main__':
 			'activation': 'leakyrelu',
 			'dropout': 0.5,
 		}
-		,
-		{
-			'name': 'elu',
-			'num_conv_layers': 3,
-			'conv_channels': [16, 32, 64],
-			'kernel_sizes': [3, 3, 3],
-			'activation': 'elu',
-			'dropout': 0.5,
-		},
-		{
-			'name': 'tanh',
-			'num_conv_layers': 3,
-			'conv_channels': [16, 32, 64],
-			'kernel_sizes': [3, 3, 3],
-			'activation': 'tanh',
-			'dropout': 0.5,
-		},		{
-			'name': 'kernel_5x5_all',
-			'num_conv_layers': 3,
-			'conv_channels': [16, 32, 64],
-			'kernel_sizes': [5, 5, 5],
-			'activation': 'relu',
-			'dropout': 0.5,
-		},
-		{
-			'name': 'kernel_7x7_first',
-			'num_conv_layers': 3,
-			'conv_channels': [16, 32, 64],
-			'kernel_sizes': [7, 3, 3],
-			'activation': 'relu',
-			'dropout': 0.5,
-		},		
-		{
-			'name': 'act_selu',
-			'num_conv_layers': 3,
-			'conv_channels': [16, 32, 64],
-			'kernel_sizes': [3, 3, 3],
-			'activation': 'selu',
-			'dropout': 0.5,
-		},
-		### Kernel sizes 
-		{
-			'name': 'kernel_mixed_531',
-			'num_conv_layers': 3,
-			'conv_channels': [16, 32, 64],
-			'kernel_sizes': [5, 3, 1],
-			'activation': 'relu',
-			'dropout': 0.5,
-		},
-
-
 	]
 
 	run_ablation(configs, epochs=args.epochs, batch_size=args.batch_size, lr=args.lr, export_top=args.export_top, aug=args.aug)

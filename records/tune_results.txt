@@ -1,7 +1,7 @@
-Tune Results Summary - 2025-11-13 17:44:42
+Tune Results Summary - 2025-11-13 17:46:05
 File                                                           Accuracy   Selected
 ------------------------------------------------------------------------------------------
-tuned_lenet_lr0.0003_bs128_drop0.6_wd0.0003_presetbalanced.pth    98.0745           
+tuned_lenet_lr0.0003_bs128_drop0.6_wd0.0003_presetbalanced.pth    97.7047           
 tuned_lenet_20251113_160457.pth                                 99.7450           
 tuned_lenet_20251113_160552.pth                                 99.8725           
 tuned_lenet_20251113_160639.pth                                 99.9235           

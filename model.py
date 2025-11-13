@@ -89,7 +89,9 @@ def build_lenet_variant(num_conv_layers=3,
                         fc_sizes=None,
                         activation='relu',
                         dropout=0.5,
-                        num_classes=43):
+                        dropout_rate=None,
+                        num_classes=43,
+                        **kwargs):
     """Build a parametric LeNet-like model.
 
     Args:
@@ -104,6 +106,12 @@ def build_lenet_variant(num_conv_layers=3,
     Returns:
         nn.Module: a LeNet-like network instance
     """
+    # Backwards-compatible handling: some callers (predict/create_model)
+    # pass `dropout_rate` while the ablation/training scripts use `dropout`.
+    # Accept both and prefer an explicitly provided `dropout_rate`.
+    if dropout_rate is not None:
+        dropout = dropout_rate
+
     if conv_channels is None:
         conv_channels = [16, 32, 64][:num_conv_layers]
     if kernel_sizes is None:
@@ -636,6 +644,8 @@ def create_model(model_name, num_classes=43, **kwargs):
     #     return MobileNetV4(variant='medium', num_classes=num_classes, **kwargs)
     # elif model_name == 'mobilenetv4_large':
     #     return MobileNetV4(variant='large', num_classes=num_classes, **kwargs)
+    elif model_name == 'lenet_variant':
+        return build_lenet_variant(num_classes=num_classes, **kwargs)
     else:
         raise ValueError(
             f"Unknown model: {model_name}. Available: 'lenet', 'minivgg', "

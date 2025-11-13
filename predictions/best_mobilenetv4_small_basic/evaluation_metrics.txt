@@ -1,10 +1,10 @@
 Model: best_mobilenetv4_small_basic
 Augmentation: basic
-Accuracy: 0.9513
-Macro F1: 0.9253
-Macro Precision: 0.9293
-Macro Recall: 0.9258
-Weighted F1: 0.9508
-Weighted Precision: 0.9523
-Weighted Recall: 0.9513
-Log Loss: 0.210475
+Accuracy: 0.9444
+Macro F1: 0.9196
+Macro Precision: 0.9259
+Macro Recall: 0.9185
+Weighted F1: 0.9442
+Weighted Precision: 0.9465
+Weighted Recall: 0.9444
+Log Loss: 0.234419

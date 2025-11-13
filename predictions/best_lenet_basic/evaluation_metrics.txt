@@ -1,10 +1,10 @@
 Model: best_lenet_basic
 Augmentation: basic
-Accuracy: 0.9635
-Macro F1: 0.9412
-Macro Precision: 0.9472
-Macro Recall: 0.9432
-Weighted F1: 0.9629
-Weighted Precision: 0.9651
-Weighted Recall: 0.9635
-Log Loss: 0.171329
+Accuracy: 0.9627
+Macro F1: 0.9394
+Macro Precision: 0.9512
+Macro Recall: 0.9359
+Weighted F1: 0.9619
+Weighted Precision: 0.9642
+Weighted Recall: 0.9627
+Log Loss: 0.200284
