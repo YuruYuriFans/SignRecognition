@@ -5,12 +5,15 @@ Features:
  - adjustable learning rate, dropout rate, weight decay
  - optional warm-start from a checkpoint
  - early stopping based on validation accuracy (patience + min_delta)
+ - run all 4 presets automatically with: python tune.py
 
 Usage examples:
-  python tune.py --epochs 20 --lr 1e-4 --dropout 0.5 --weight_decay 1e-4 --patience 5 --ckpt trained_models/best_lenet_none.pth
+  python tune.py                 # Run all 4 presets sequentially
+  python tune.py --preset balanced --epochs 20
+  python tune.py --ckpt trained_models/best_lenet_basic.pth --epochs 60 --lr 0.0003
   python tune.py --eval-only --ckpt trained_models/best_lenet_none.pth
-
-The script writes the best checkpoint to `trained_models/tuned_lenet_<timestamp>.pth`.
+  python tune.py --preset default_advanced_augmentation
+The script writes the best checkpoint to `trained_models/best_lenet_tuned_<params>.pth`.
 """
 
 import argparse
@@ -102,70 +105,12 @@ def load_checkpoint_weights(model, ckpt_path, device):
 		model.load_state_dict(state, strict=False)
 
 
-def main():
-	parser = argparse.ArgumentParser(description='Fine-tune LeNet')
-	parser.add_argument('--ckpt', type=str, default=None, help='Path to checkpoint to warm-start from')
-	parser.add_argument('--preset', type=str, default='balanced', choices=['fast', 'balanced', 'conservative'],
-						help='Pre-defined tuning preset used when explicit parameters are not provided')
-	# If user does not provide explicit numeric values we detect None and apply the preset values below.
-	parser.add_argument('--epochs', type=int, default=None, help='Number of epochs (overridden by preset if not provided)')
-	parser.add_argument('--batch_size', type=int, default=None, help='Batch size (overridden by preset if not provided)')
-	parser.add_argument('--lr', type=float, default=None, help='Learning rate (overridden by preset if not provided)')
-	parser.add_argument('--dropout', type=float, default=None, help='Dropout rate (overridden by preset if not provided)')
-	parser.add_argument('--weight_decay', type=float, default=None, help='Weight decay (overridden by preset if not provided)')
-	parser.add_argument('--patience', type=int, default=None, help='Early stopping patience (epochs)')
-	parser.add_argument('--min_delta', type=float, default=None, help='Minimum change to qualify as improvement')
-	parser.add_argument('--eval-only', action='store_true', help='Only evaluate the provided checkpoint')
-	parser.add_argument('--optimizer', type=str, default='adam', choices=['adam','adamw','sgd'], help='Optimizer to use for fine-tuning')
-	parser.add_argument('--scheduler', type=str, default='none', choices=['none','onecycle'], help='LR scheduler to use (onecycle recommended for sgd)')
-	parser.add_argument('--max_lr', type=float, default=None, help='Max LR for OneCycleLR (optional)')
-	parser.add_argument('--aug', type=str, default='basic', choices=['none', 'basic', 'advanced'], help='Augmentation strategy for fine-tuning')
-	args = parser.parse_args()
-
-	# Pre-defined presets (defaults for runs without explicit numeric params)
-	presets = {
-    'fast': {
-        'epochs': 5,
-        'batch_size': 128,
-        'lr': 5e-4,
-        'dropout': 0.3,
-        'weight_decay': 1e-5,
-        'patience': 2,
-        'min_delta': 0.0,
-    },
-    'balanced': {
-        'epochs': 20,
-        'batch_size': 128,
-        'lr': 2e-4,
-        'dropout': 0.5,
-        'weight_decay': 1e-5,
-        'patience': 6,
-        'min_delta': 0.001,
-    },
-    'conservative': {
-        'epochs': 50,
-        'batch_size': 32,
-        'lr': 5e-5,
-        'dropout': 0.5,
-        'weight_decay': 1e-4,
-        'patience': 8,
-        'min_delta': 0.01,
-    }
-}
-
-	# Apply preset values only for the parameters not explicitly provided (i.e., still None)
-	preset_values = presets.get(args.preset, presets['balanced'])
-	for key, val in preset_values.items():
-		if getattr(args, key) is None:
-			setattr(args, key, val)
-
-	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-	print(f"Using device: {device}")
-
+def tune_single_preset(args, device):
+	"""Run fine-tuning for a single preset configuration."""
 	# Transforms and dataset
 	train_transform, val_transform, _ = get_augmentation_transforms(args.aug, input_size=48)
 	dataset_full = GTSRBDataset(root_dir='Final_Training', transform=train_transform, is_train=True)
-	# 90/10 split
+	# 80/20 split
 	train_size = int(0.8 * len(dataset_full))
 	val_size = len(dataset_full) - train_size
 	train_dataset, val_dataset = torch.utils.data.random_split(dataset_full, [train_size, val_size])
@@ -187,7 +132,7 @@ def main():
 			print(f"Warning: could not load checkpoint weights: {e}")
 
 	# Evaluate-only mode
-	criterion = nn.CrossEntropyLoss(label_smoothing=0.1)  #TODO
+	criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
 	if args.eval_only:
 		val_loss, val_acc = validate_epoch(model, val_loader, criterion, device)
 		print(f"Validation - Loss: {val_loss:.4f}, Acc: {val_acc:.2f}%")
@@ -278,13 +223,13 @@ def main():
 			except Exception as e:
 				print(f"✗ Failed to copy to trained_models: {e}")
 				best_checkpoint = tuned_path
-			else:
-					epochs_no_improve += 1
-					print(f"No improvement for {epochs_no_improve} epoch(s)")
+		else:
+			epochs_no_improve += 1
+			print(f"No improvement for {epochs_no_improve} epoch(s)")
 
-					if epochs_no_improve >= args.patience:
-						print(f"Early stopping triggered (patience={args.patience})")
-						break
+			if epochs_no_improve >= args.patience:
+				print(f"Early stopping triggered (patience={args.patience})")
+				break
 
 	print("\nFine-tuning completed.")
 	if best_checkpoint:
@@ -413,6 +358,102 @@ def main():
 	print(f"Tune summary written to: {summary_path}")
 
 
+def main():
+	parser = argparse.ArgumentParser(description='Fine-tune LeNet')
+	parser.add_argument('--ckpt', type=str, default=None, help='Path to checkpoint to warm-start from')
+	parser.add_argument('--preset', type=str, default=None, choices=['fast', 'balanced', 'conservative', 'default'],
+						help='Pre-defined tuning preset (if None, all presets will be run)')
+	# If user does not provide explicit numeric values we detect None and apply the preset values below.
+	parser.add_argument('--epochs', type=int, default=None, help='Number of epochs (overridden by preset if not provided)')
+	parser.add_argument('--batch_size', type=int, default=None, help='Batch size (overridden by preset if not provided)')
+	parser.add_argument('--lr', type=float, default=None, help='Learning rate (overridden by preset if not provided)')
+	parser.add_argument('--dropout', type=float, default=None, help='Dropout rate (overridden by preset if not provided)')
+	parser.add_argument('--weight_decay', type=float, default=None, help='Weight decay (overridden by preset if not provided)')
+	parser.add_argument('--patience', type=int, default=None, help='Early stopping patience (epochs)')
+	parser.add_argument('--min_delta', type=float, default=None, help='Minimum change to qualify as improvement')
+	parser.add_argument('--eval-only', action='store_true', help='Only evaluate the provided checkpoint')
+	parser.add_argument('--optimizer', type=str, default='adam', choices=['adam','adamw','sgd'], help='Optimizer to use for fine-tuning')
+	parser.add_argument('--scheduler', type=str, default='none', choices=['none','onecycle'], help='LR scheduler to use (onecycle recommended for sgd)')
+	parser.add_argument('--max_lr', type=float, default=None, help='Max LR for OneCycleLR (optional)')
+	parser.add_argument('--aug', type=str, default='basic', choices=['none', 'basic', 'advanced'], help='Augmentation strategy for fine-tuning')
+	args = parser.parse_args()
+
+	# Pre-defined presets (defaults for runs without explicit numeric params)
+# Pre-defined presets (defaults for runs without explicit numeric params)
+	presets = {
+		'fast': {
+			'epochs': 15,
+			'batch_size': 128,
+			'lr': 3e-4,
+			'dropout': 0.5,
+			'weight_decay': 1e-4,
+			'patience': 5,
+			'min_delta': 0.0,
+		},
+		'balanced': {
+			'epochs': 40,
+			'batch_size': 128,
+			'lr': 2e-4,
+			'dropout': 0.55,
+			'weight_decay': 2e-4,
+			'patience': 10,
+			'min_delta': 0.0,
+		},
+		'conservative': {
+			'epochs': 60,
+			'batch_size': 64,
+			'lr': 1e-4,
+			'dropout': 0.6,
+			'weight_decay': 3e-4,
+			'patience': 15,
+			'min_delta': 0.0,
+		},
+		'default': {
+			'epochs': 50,
+			'batch_size': 128,
+			'lr': 2.5e-4,
+			'dropout': 0.55,
+			'weight_decay': 2.5e-4,
+			'patience': 12,
+			'min_delta': 0.0,
+		},
+	}
+	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+	print(f"Using device: {device}")
+
+	# If preset is None and no explicit parameters provided, run all presets
+	if args.preset is None and args.epochs is None and args.batch_size is None and args.lr is None:
+		print("\n" + "="*60)
+		print("Running all 5 presets sequentially...")
+		print("="*60 + "\n")
+		for preset_name in ['fast', 'balanced', 'conservative', 'default']:
+			print(f"\n{'#'*60}")
+			print(f"Starting preset: {preset_name.upper()}")
+			print(f"{'#'*60}\n")
+			# Create a copy of args and set the preset
+			args_copy = argparse.Namespace(**vars(args))
+			args_copy.preset = preset_name
+			# Apply preset values
+			preset_values = presets[preset_name]
+			for key, val in preset_values.items():
+				setattr(args_copy, key, val)
+			# Run tuning for this preset
+			tune_single_preset(args_copy, device)
+		return
+	
+	# If preset is None but some parameters are provided, use balanced as default
+	if args.preset is None:
+		args.preset = 'balanced'
+	
+	# Apply preset values only for the parameters not explicitly provided (i.e., still None)
+	preset_values = presets.get(args.preset, presets['balanced'])
+	for key, val in preset_values.items():
+		if getattr(args, key) is None:
+			setattr(args, key, val)
+	
+	# Run single preset
+	tune_single_preset(args, device)
+
+
 if __name__ == '__main__':
 	main()
-

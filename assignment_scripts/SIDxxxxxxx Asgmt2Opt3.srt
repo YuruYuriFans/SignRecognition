@@ -1,0 +1,211 @@
+1
+00:00:02,570 --> 00:00:05,710
+Traffic sign recognition faces a key challenge:
+
+2
+00:00:06,110 --> 00:00:10,070
+Balancing accuracy with computational efficiency for embedded devices.
+
+3
+00:00:10,610 --> 00:00:14,790
+While modern networks achieve high accuracy, speed remains
+
+4
+00:00:14,790 --> 00:00:15,530
+under research.
+
+5
+00:00:16,210 --> 00:00:18,830
+This study asks, can the 30-year-old
+
+6
+00:00:18,830 --> 00:00:20,450
+LeNet-5 still compete?
+
+7
+00:00:20,930 --> 00:00:23,330
+Our methodology has three parts.
+
+8
+00:00:23,790 --> 00:00:27,090
+First, we compare four architectures on GTSRB.
+
+9
+00:00:27,550 --> 00:00:30,810
+Second, we fine-tune LeNet-5 to maximize performance.
+
+10
+00:00:31,610 --> 00:00:35,130
+Third, we conduct ablation studies to validate each
+
+11
+00:00:35,130 --> 00:00:36,050
+design choice.
+
+12
+00:00:36,890 --> 00:00:41,090
+We use GTSRB over 50,000 images across
+
+13
+00:00:41,090 --> 00:00:43,570
+43 imbalanced classes.
+
+14
+00:00:44,190 --> 00:00:48,810
+Our metrics balance prediction quality and computational efficiency.
+
+15
+00:00:50,510 --> 00:00:55,550
+MiniVGG leads in accuracy at 98%, but
+
+16
+00:00:55,550 --> 00:01:04,690
+LeNet-5 delivers exceptional speed, processing 120,000 images
+
+17
+00:01:04,690 --> 00:01:08,050
+per second on my personal device, which is
+
+18
+00:01:08,050 --> 00:01:11,170
+four times faster than MiniVGG, with only
+
+19
+00:01:11,170 --> 00:01:12,630
+2% accuracy loss.
+
+20
+00:01:14,190 --> 00:01:18,690
+This demonstrates a fundamental accuracy speed tradeoff.
+
+21
+00:01:21,360 --> 00:01:24,580
+Ablation studies validate LeNet-5's design.
+
+22
+00:01:24,980 --> 00:01:30,680
+Data augmentation showed minimal improvement because GTSRB has
+
+23
+00:01:30,680 --> 00:01:34,840
+already had sufficient natural variation.
+
+24
+00:01:35,440 --> 00:01:40,880
+Alternative kernels and activation functions dramatically degraded performance,
+
+25
+00:01:41,540 --> 00:01:46,880
+confirming that the original 5x5 kernels and RELU
+
+26
+00:01:46,880 --> 00:01:50,120
+are optimal for this shallow architecture.
+
+27
+00:01:51,400 --> 00:01:55,260
+Fine-tuning experiments with label smoothing and optimizer
+
+28
+00:01:55,260 --> 00:02:01,100
+adjustments revealed that LeNet-5 already operates near its
+
+29
+00:02:01,100 --> 00:02:02,800
+performance ceiling.
+
+30
+00:02:04,540 --> 00:02:08,680
+This validates the robustness of the original architecture.
+
+31
+00:02:10,640 --> 00:02:17,080
+MiniVGG's deeper architecture with sequential 3x3 blocks
+
+32
+00:02:17,080 --> 00:02:23,320
+creates a robust feature hierarchy for complex patterns,
+
+33
+00:02:23,820 --> 00:02:28,800
+but requires 8.6x more computation.
+
+34
+00:02:29,580 --> 00:02:34,960
+LeNet-5's shallow design with 5x5 kernels minimizes overhead
+
+35
+00:02:34,960 --> 00:02:40,460
+while maintaining adequate capacity, enabling four times faster
+
+36
+00:02:40,460 --> 00:02:42,060
+actual inference.
+
+37
+00:02:43,180 --> 00:02:47,500
+So, for real-time embedded systems with limited
+
+38
+00:02:47,500 --> 00:02:50,600
+resources, LeNet-5 is ideal.
+
+39
+00:02:51,160 --> 00:02:57,080
+But for safety-critical applications with available computational
+
+40
+00:02:57,080 --> 00:03:03,300
+resources, MiniVGG's superior accuracy justifies the cost.
+
+41
+00:03:04,500 --> 00:03:08,900
+Current limitations include daytime-only images and ideal
+
+42
+00:03:08,900 --> 00:03:09,740
+conditions.
+
+43
+00:03:10,400 --> 00:03:14,960
+Future work should address adverse weather, nighttime scenarios,
+
+44
+00:03:15,200 --> 00:03:17,860
+and real-world testing across multiple datasets.
+
+45
+00:03:20,140 --> 00:03:24,140
+Our conclusion is that LeNet-5 achieves 96%
+
+46
+00:03:24,140 --> 00:03:29,660
+accuracy at 120,000 images per second on
+
+47
+00:03:29,660 --> 00:03:34,660
+my personal devices, providing its continued relevance, while
+
+48
+00:03:34,660 --> 00:03:37,000
+MiniVGG is more accurate.
+
+49
+00:03:38,280 --> 00:03:42,600
+LeNet-5 is four times faster and 87%
+
+50
+00:03:42,600 --> 00:03:46,660
+% lower computational cost make it ideal for
+
+51
+00:03:46,660 --> 00:03:48,540
+embedded real-time applications.
+
+52
+00:03:49,320 --> 00:03:53,300
+So, the 30-year-old architecture remains remarkably
+
+53
+00:03:53,300 --> 00:03:54,120
+competitive.

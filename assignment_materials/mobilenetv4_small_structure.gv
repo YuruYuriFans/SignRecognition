@@ -1,0 +1,28 @@
+digraph mobilenetv4_small_structure {
+	graph [bgcolor=transparent fontname=Helvetica rankdir=LR splines=ortho]
+	Input [label="Input
+(3, 48, 48)" fillcolor="#FFFFFF" fontcolor=black shape=box style=filled]
+	S0 [label="ConvBN x1 (3->32)
+S=2" fillcolor="#F9A825" fontcolor=black shape=box style=filled]
+	Input -> S0
+	S1 [label="ConvBN x2
+S=2, S=1" fillcolor="#F9A825" fontcolor=black shape=box style=filled]
+	S0 -> S1
+	S2 [label="ConvBN x2
+S=2, S=1" fillcolor="#F9A825" fontcolor=black shape=box style=filled]
+	S1 -> S2
+	S3 [label="UIB Block (x6)
+(5,5,S=2) + (0,3,S=1) x4 + (3,0,S=1)
+Output: 96" fillcolor="#90CAF9" fontcolor=black shape=box style=filled]
+	S2 -> S3
+	S4 [label="UIB Block (x6)
+(3,3,S=2) + (5,5,S=1) + ...
+Output: 128" fillcolor="#90CAF9" fontcolor=black shape=box style=filled]
+	S3 -> S4
+	S5 [label="Final ConvBN + AvgPool
+Output: 640" fillcolor="#FFCC80" fontcolor=black shape=box style=filled]
+	S4 -> S5
+	Output [label="FC (640->43)
++ Dropout" fillcolor="#FFFFFF" fontcolor=black shape=box style=filled]
+	S5 -> Output
+}

@@ -222,7 +222,7 @@ def run_ablation(configs, epochs=1, batch_size=64, lr=1e-4, export_top=1, aug='b
 		copied = None
 		if best_ck and export_top > 0:
 			try:
-				best_name = f"best_lenet_ablation_{run_folder}_{timestamp}.pth"
+				best_name = f"best_lenet_ablation_{name}_{run_folder}_{timestamp}.pth"
 				dest = os.path.join('trained_models', best_name)
 				# Load checkpoint and clean state dict before re-saving
 				ck = torch.load(best_ck, map_location='cpu')
@@ -274,6 +274,23 @@ if __name__ == '__main__':
 	# Minimal example configurations: remove second conv, change kernels to 3x3, use leakyrelu
 	configs = [
 		{
+			'name': 'baseline_lenet',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [3, 3, 3],
+			'activation': 'relu',
+			'dropout': 0.5,
+		},
+		# Layer depth ablations
+				{
+			'name': 'depth_1_layer',
+			'num_conv_layers': 1,
+			'conv_channels': [32],
+			'kernel_sizes': [5],
+			'activation': 'relu',
+			'dropout': 0.5,
+		},
+		{
 			'name': 'remove_second_conv',
 			'num_conv_layers': 2,
 			'conv_channels': [16, 32],
@@ -282,6 +299,15 @@ if __name__ == '__main__':
 			'dropout': 0.5,
 		},
 		{
+			'name': 'depth_4_layers',
+			'num_conv_layers': 4,
+			'conv_channels': [16, 32, 64, 128],
+			'kernel_sizes': [3, 3, 3, 3],
+			'activation': 'relu',
+			'dropout': 0.5,
+		},
+		# Kernel size ablations
+		{
 			'name': 'kernels_3x3',
 			'num_conv_layers': 3,
 			'conv_channels': [16, 32, 64],
@@ -289,6 +315,31 @@ if __name__ == '__main__':
 			'activation': 'relu',
 			'dropout': 0.5,
 		},
+				{
+			'name': 'kernel_5x5_all',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [5, 5, 5],
+			'activation': 'relu',
+			'dropout': 0.5,
+		},
+		{
+			'name': 'kernel_7x7_first',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [7, 3, 3],
+			'activation': 'relu',
+			'dropout': 0.5,
+		},
+		{
+			'name': 'kernel_mixed_531',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [5, 3, 1],
+			'activation': 'relu',
+			'dropout': 0.5,
+		},
+		# Activation function change
 		{
 			'name': 'leakyrelu',
 			'num_conv_layers': 3,
@@ -296,7 +347,39 @@ if __name__ == '__main__':
 			'kernel_sizes': [3, 3, 3],
 			'activation': 'leakyrelu',
 			'dropout': 0.5,
-		}
+		},
+		{
+			'name': 'act_selu',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [3, 3, 3],
+			'activation': 'selu',
+			'dropout': 0.5,
+		},
+		{
+			'name': 'act_gelu',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [3, 3, 3],
+			'activation': 'gelu',
+			'dropout': 0.5,
+		},
+		{
+			'name': 'act_swish',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [3, 3, 3],
+			'activation': 'swish',
+			'dropout': 0.5,
+		},
+		{
+			'name': 'act_mish',
+			'num_conv_layers': 3,
+			'conv_channels': [16, 32, 64],
+			'kernel_sizes': [3, 3, 3],
+			'activation': 'mish',
+			'dropout': 0.5,
+		},
 	]
 
 	run_ablation(configs, epochs=args.epochs, batch_size=args.batch_size, lr=args.lr, export_top=args.export_top, aug=args.aug)

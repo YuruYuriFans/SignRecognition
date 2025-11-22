@@ -1,0 +1,23 @@
+digraph lenet_structure {
+	graph [bgcolor=transparent fontname=Helvetica rankdir=LR splines=ortho]
+	Input [label="Input
+(3, 48, 48)" fillcolor="#FFFFFF" fontcolor=black shape=box style=filled]
+	C1 [label="Conv (3->16)
++ Pool (24, 24, 16)" fillcolor="#64B5F6" fontcolor=black shape=box style=filled]
+	C2 [label="Conv (16->32)
++ Pool (12, 12, 32)" fillcolor="#64B5F6" fontcolor=black shape=box style=filled]
+	C3 [label="Conv (32->64)
++ Pool (6, 6, 64)" fillcolor="#64B5F6" fontcolor=black shape=box style=filled]
+	F [label="Flatten
+(2304)" fillcolor="#E0E0E0" fontcolor=black shape=box style=filled]
+	FC1 [label="FC1 (2304->256)
++ ReLU + Drop" fillcolor="#FFCC80" fontcolor=black shape=box style=filled]
+	Output [label="FC2 (256->43)
+Output" fillcolor="#FFFFFF" fontcolor=black shape=box style=filled]
+	Input -> C1
+	C1 -> C2
+	C2 -> C3
+	C3 -> F
+	F -> FC1
+	FC1 -> Output
+}

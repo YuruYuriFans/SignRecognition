@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/home/boyan/Desktop/COMP3419/SignRecognition/test.py", line 8, in <module>
-    from predict import load_model
-ImportError: cannot import name 'load_model' from 'predict' (/home/boyan/Desktop/COMP3419/SignRecognition/predict.py)

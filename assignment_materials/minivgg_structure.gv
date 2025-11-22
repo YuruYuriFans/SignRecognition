@@ -1,0 +1,20 @@
+digraph minivgg_structure {
+	graph [bgcolor=transparent fontname=Helvetica rankdir=LR splines=ortho]
+	Input [label="Input
+(3, 48, 48)" fillcolor="#FFFFFF" fontcolor=black shape=box style=filled]
+	B1 [label="Block 1: [2x Conv-ReLU] + Pool + Drop(0.25)
+Output: (24, 24, 32)" fillcolor="#64B5F6" fontcolor=black shape=box style=filled]
+	B2 [label="Block 2: [2x Conv-ReLU] + Pool + Drop(0.25)
+Output: (12, 12, 64)" fillcolor="#64B5F6" fontcolor=black shape=box style=filled]
+	F [label="Flatten
+(9216)" fillcolor="#E0E0E0" fontcolor=black shape=box style=filled]
+	C1 [label="FC (9216->512)
++ ReLU + Drop" fillcolor="#FFCC80" fontcolor=black shape=box style=filled]
+	Output [label="FC (512->43)
+Output" fillcolor="#FFFFFF" fontcolor=black shape=box style=filled]
+	Input -> B1
+	B1 -> B2
+	B2 -> F
+	F -> C1
+	C1 -> Output
+}

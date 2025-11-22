@@ -1,0 +1,29 @@
+digraph mobilenetv2_025_structure {
+	graph [bgcolor=transparent fontname=Helvetica rankdir=LR splines=ortho]
+	Input [label="Input
+(3, 48, 48)" fillcolor="#FFFFFF" fontcolor=black shape=box style=filled]
+	N0 [label="Conv (3->C(16))
+Stride 2" fillcolor="#C5E1A5" fontcolor=black shape=box style=filled]
+	Input -> N0
+	N1 [label="InvRes x1 (t=1, S=1)
+Output: C(16)" fillcolor="#C5E1A5" fontcolor=black shape=box style=filled]
+	N0 -> N1
+	N2 [label="InvRes x2 (t=6, S=2)
+Output: C(24)" fillcolor="#C5E1A5" fontcolor=black shape=box style=filled]
+	N1 -> N2
+	N3 [label="InvRes x3 (t=6, S=2)
+Output: C(32)" fillcolor="#C5E1A5" fontcolor=black shape=box style=filled]
+	N2 -> N3
+	N4 [label="InvRes x4 (t=6, S=2)
+Output: C(64)" fillcolor="#C5E1A5" fontcolor=black shape=box style=filled]
+	N3 -> N4
+	N5 [label="InvRes x3 (t=6, S=1)
+Output: C(96)" fillcolor="#C5E1A5" fontcolor=black shape=box style=filled]
+	N4 -> N5
+	N6 [label="Conv (C(96)->C(512)) + AvgPool
+Output: C(512)" fillcolor="#FFCC80" fontcolor=black shape=box style=filled]
+	N5 -> N6
+	Output [label="FC (C(512)->43)
++ Dropout" fillcolor="#FFFFFF" fontcolor=black shape=box style=filled]
+	N6 -> Output
+}
